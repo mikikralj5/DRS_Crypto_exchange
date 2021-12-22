@@ -13,11 +13,11 @@ class User(db.Model):
     phone = db.Column(db.String(50))
     country = db.Column(db.String(50))
     city = db.Column(db.String(50))
-    crypto_account = db.relationship(
-        "CryptoAccount", backref="user", uselist=False
-    )  # one to one
-    payment_card = db.relationship("PaymentCard", backref="user", uselist=False)
-    transations = db.relationship("Transaction", backref="user")
+    # crypto_account = db.relationship(
+    #     "CryptoAccount", backref="user", uselist=False
+    # )  # one to one
+    # payment_card = db.relationship("PaymentCard", backref="user", uselist=False)
+    # transations = db.relationship("Transaction", backref="user")
 
     def __init__(
         self, first_name, last_name, address, password, email, phone, country, city
