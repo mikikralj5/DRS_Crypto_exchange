@@ -1,28 +1,37 @@
-from config import db, ma
-from marshmallow import Schema, fields
+# from config import db, ma
+# from marshmallow import Schema, fields
+
 
 # class User(db.Model):
-#     __tablename__ = 'user'
-#     person_id = db.Column(db.Integer, primary_key=True)
-#     lname = db.Column(db.String(32), index=True)
-#     fname = db.Column(db.String(32))
-#     timestamp = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+#     __tablename__ = "user"
+#     id = db.Column(db.Integer, primary_key=True)
+#     first_name = db.Column(db.String(32))
+#     last_name = db.Column(db.String(32))
+#     address = db.Column(db.String(50))
+#     password = db.Column(db.String(50))
+#     email = db.Column(db.String(50))
+#     phone = db.Column(db.String(50))
+#     country = db.Column(db.String(50))
+#     city = db.Column(db.String(50))
+#     crypto_account = db.relationship(
+#         "CryptoAccount", backref="user", uselist=False
+#     )  # one to one
+#     payment_card = db.relationship("PaymentCard", backref="user", uselist=False)
+#     transations = db.relationship("Transaction", backref="user")
 
-#     def __init__(self, lastName, firstName):
-#         self.lname = lastName
-#         self.fname = firstName
+#     def __init__(
+#         self, first_name, last_name, address, password, email, phone, country, city
+#     ):
+#         self.first_name = first_name
+#         self.last_name = last_name
+#         self.address = address
+#         self.password = password
+#         self.email = email
+#         self.phone = phone
+#         self.country = country
+#         self.city = city
 
-#         def __repr__(self):
-#             return '<User %r>' % self.fname
 
-# class UserSchema(Schema):
-#     person_id = fields.Number()
-#     lname = fields.Str()
-#     fname = fields.Str()
-#     timestamp = fields.Date()
-
-
-class User(db.Model):
-    __tablename__ = "user"
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(32))
+# class UserSchema(ma.Schema):
+#     class meta:
+#         fields("id", "first_name", "last_name", "address")
