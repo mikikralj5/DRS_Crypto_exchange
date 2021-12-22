@@ -7,7 +7,7 @@ class CryptoCurrency(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Integer)
     name = db.Column(db.String(32))
-    # account_id = db.Column(db.Integer, db.ForeignKey("crypto_account.id"))
+    account_id = db.Column(db.Integer, db.ForeignKey("crypto_account.id"))
 
 
 class CryptoCurrencySchema(ma.Schema):

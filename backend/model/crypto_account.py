@@ -1,20 +1,21 @@
-# from sqlalchemy.orm import backref
-# from config import db, ma
-# from marshmallow import Schema, fields
-# from .crypto_currency import CryptoCurrencySchema
+from sqlalchemy.orm import backref
+from config import db, ma
+from marshmallow import Schema, fields
+from .crypto_currency import CryptoCurrencySchema
 
 
-# class CryptoAccount(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     crypto_currencies = db.relationship(
-#         "CryptoCurrency", backref="account"
-#     )  # one to many
-#     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+class CryptoAccount(db.Model):
+    __tablename__ = "crypto_account"
+    id = db.Column(db.Integer, primary_key=True)
+    crypto_currencies = db.relationship(
+        "CryptoCurrency", backref="account"
+    )  # one to many
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-#     def __init__(self):
-#         self.crypto_currencies = []
+    def __init__(self):
+        self.crypto_currencies = []
 
 
-# class CryptoAccountSchema(ma.Schema):
-#     id = fields.Number()
-#     crypto_currencies = fields.List(fields.Nested(CryptoCurrencySchema))
+class CryptoAccountSchema(ma.Schema):
+    id = fields.Number()
+    crypto_currencies = fields.List(fields.Nested(CryptoCurrencySchema))
