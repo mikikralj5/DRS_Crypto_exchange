@@ -1,8 +1,4 @@
 import bcrypt
-import redis
-from dotenv import load_dotenv
-import os
-load_dotenv()
 from flask import Flask, jsonify, request, abort, session
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -14,24 +10,25 @@ from model.transaction import Transaction, TransactionSchema
 from model.payment_card import PaymentCard, PaymentCardSchema
 from model.crypto_currency import CryptoCurrency, CryptoCurrencySchema
 from model.crypto_account import CryptoAccount, CryptoAccountSchema
-#pip install requirements
 
-from config import db, ma
+
+from config import db, ma, ApplicationConfig
 
 app = Flask(__name__)
+app.config.from_object(ApplicationConfig)
 CORS(app)
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-    basedir, "CryptoDB.db"
-)
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
+#     basedir, "CryptoDB.db"
+# )
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-app.config["SESSION_TYPE"] = redis
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_REDIS"] = redis.from_url("redis://127.0.0.1:6379")
+# app.config["SESSION_TYPE"] = redis
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_REDIS"] = redis.from_url("redis://127.0.0.1:6379")
 
 bcrypt = Bcrypt(app)
 server_session = Session(app) #enabeld server side seesion sve je na serveru sem session id 
