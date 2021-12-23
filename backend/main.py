@@ -29,7 +29,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-app.config["SESSION_USE_SIGNER"] = False
 app.config["SESSION_TYPE"] = redis
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_REDIS"] = redis.from_url("redis://127.0.0.1:6379")
@@ -78,6 +77,7 @@ def register_user():
     return {"hello": "worlds"}
 
 
+
 @app.route("/login", methods=["POST"])
 def login_user():
     password = request.json["password"]
@@ -93,6 +93,7 @@ def login_user():
     session["user_id"] = user.id #on je pravio neki hex za id
 
     return user_schema.jsonify(user)
+
 
 
 @app.route("/@me")
