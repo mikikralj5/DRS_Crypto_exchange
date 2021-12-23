@@ -55,7 +55,7 @@ def register_user():
 
     db.session.add(user)
     db.session.commit()
-    return user_schema.jsonify(user)
+    return {"hello": "worlds"}
 
 
 if __name__ == "__main__":
