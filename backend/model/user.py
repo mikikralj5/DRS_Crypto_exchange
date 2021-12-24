@@ -16,11 +16,12 @@ class User(db.Model):
     phone = db.Column(db.String(50))
     country = db.Column(db.String(50))
     city = db.Column(db.String(50))
+    otp = db.Column(db.String(7))
     crypto_account = db.relationship(
         "CryptoAccount", backref="user", uselist=False
     )  # one to one
     payment_card = db.relationship("PaymentCard", backref="user", uselist=False)
-    transations = db.relationship("Transaction", backref="user")
+    transactions = db.relationship("Transaction", backref="user")
 
     def __init__(
         self, first_name, last_name, address, password, email, phone, country, city
@@ -37,6 +38,7 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     id = fields.Number()
+    first_name = fields.Str()
     last_name = fields.Str()
     address = fields.Str()
     password = fields.Str()
@@ -44,6 +46,7 @@ class UserSchema(ma.Schema):
     phone = fields.Str()
     country = fields.Str()
     city = fields.Str()
+    otp = fields.Str()
     crypto_account = fields.Nested(CryptoAccountSchema)
     payment_card = fields.Nested(PaymentCardSchema)
-    transations = fields.List(fields.Nested(TransactionSchema))
+    transactions = fields.List(fields.Nested(TransactionSchema))

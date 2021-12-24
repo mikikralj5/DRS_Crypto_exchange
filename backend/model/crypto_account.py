@@ -13,10 +13,9 @@ class CryptoAccount(db.Model):
     )  # one to many
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def __init__(self):
-        self.crypto_currencies = []
-
 
 class CryptoAccountSchema(ma.Schema):
     id = fields.Number()
+    amount = fields.Number()
     crypto_currencies = fields.List(fields.Nested(CryptoCurrencySchema))
+    user_id = fields.Number()

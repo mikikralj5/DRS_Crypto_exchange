@@ -24,3 +24,10 @@ class ApplicationConfig:
     SESSION_PERMANENT = False
     SESSION_USE_SIGNER = True
     SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")
+
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USERNAME = 'mailzaaplikaciju21@gmail.com'
+    MAIL_PASSWORD = 'mailzaaplikaciju21'
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True

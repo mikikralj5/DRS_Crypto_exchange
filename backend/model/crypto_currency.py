@@ -9,6 +9,13 @@ class CryptoCurrency(db.Model):
     name = db.Column(db.String(32))
     account_id = db.Column(db.Integer, db.ForeignKey("crypto_account.id"))
 
+    # def __init__(
+    #         self, amount, name, account_id
+    # ):
+    #     self.amount = amount
+    #     self.name = name
+    #     self.account_id = account_id
+
 
 class CryptoCurrencySchema(ma.Schema):
     id = fields.Number()

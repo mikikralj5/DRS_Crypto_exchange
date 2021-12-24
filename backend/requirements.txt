@@ -4,3 +4,8 @@ flask-bcrypt
 flask-session
 redis
 python-dotenv
+mysqlclient
+flask-marshmallow
+marshmallow-sqlalchemy
+flask-cors
+flask-mail
