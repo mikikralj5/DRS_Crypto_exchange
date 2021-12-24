@@ -106,7 +106,8 @@ nav {
 }
 
 .logo {
-  height: 5.25rem;
+  height: 15rem;
+  margin-bottom: 1.5rem;
 }
 
 .login {
@@ -119,7 +120,7 @@ nav {
   font-size: 1.6rem;
   font-family: inherit;
   text-align: center;
-  width: 12rem;
+  width: 23rem;
   border-radius: 10rem;
   margin-right: 1rem;
   color: inherit;
@@ -162,10 +163,6 @@ nav {
   grid-template-columns: 4fr 3fr;
   grid-template-rows: auto repeat(3, 15rem) auto;
   gap: 2rem;
-
-  /* NOTE This creates the fade in/out anumation */
-  opacity: 0;
-  transition: all 1s;
 }
 
 .balance {
