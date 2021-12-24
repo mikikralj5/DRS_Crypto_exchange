@@ -7,7 +7,7 @@ from flask_session import Session
 from werkzeug.utils import redirect
 import  random
 import  string
-
+from sha3 import keccak_256
 
 from model.user import User, UserSchema
 from model.transaction import Transaction, TransactionSchema
@@ -85,8 +85,27 @@ def send_mail(user):
     mail.send(msg)
 
 
-# @app.route("/createTransaction")
-# def create_transaction():
+def user_exists(email):
+    user_exist = User.query.filter_by(email=email).first() is None
+    if user_exist is None:
+        return False
+    else:
+        return True
+
+
+@app.route("/createTransaction")
+def create_transaction():
+    recipient_email = request.json["recipient_email"]
+    amount = request.json["amount"]
+    if user_exists(recipient_email) is True:
+        user_id = session.get("user_id")
+        user = User.query.get(user_id)
+
+        trasaction = Transaction(sender=user.email, recipient=recipient_email, amount=amount, user_id=user_id, user=user)
+        keccak_256()
+
+    else:
+        return "User with that email doesn't exist", 400
 
 
 @app.route("/sortTransactions")
@@ -102,7 +121,6 @@ def sort_function():
         all_transactions.sort(key=sort_by)
     else:
         all_transactions.sort(key=sort_by, reversed=True)
-
 
 
 @app.route("/getTransactions")
@@ -152,7 +170,7 @@ def register_user():
 
     user_exists = User.query.filter_by(email=email).first() is not None #true ako postoji taj User
     if user_exists == True:
-        return jsonify({"error": "User with that email already exists"}, 409)
+        return jsonify({"error": "User with that email already exists"}) , 409
 
     hashed_password = bcrypt.generate_password_hash(password)
     user = User(name, lname, address, hashed_password, email, phone, country, city)
@@ -171,10 +189,10 @@ def login_user():
 
     user = User.query.filter_by(email=email).first() 
     if user == None:
-        return jsonify({"error" : "Unauthorized"}, 401)
+        return jsonify({"error": "Unauthorized"}), 401
 
     if not bcrypt.check_password_hash(user.password, password):
-         return jsonify({"error" : "Unauthorized"}, 401)
+         return jsonify({"error": "Unauthorized"}), 401
 
     session["user_id"] = user.id #on je pravio neki hex za id
 
@@ -192,7 +210,7 @@ def get_current_user():
     user_id = session.get("user_id")
 
     if not user_id:
-        return jsonify({"error" : "Unauthorized"}, 401)
+        return jsonify({"error" : "Unauthorized"}), 401
 
     user = User.query.filter_by(id=user_id).first()
     return user_schema.jsonify(user)
@@ -215,7 +233,7 @@ def update_user():
 
     email_adress_exists = User.query.filter_by(email=user.email).count() #true ako postoji taj User
     if email_adress_exists > 1:
-        return jsonify({"error" : "User with that email alredy exists"}, 409)
+        return jsonify({"error" : "User with that email alredy exists"}), 409
 
     user.password = bcrypt.generate_password_hash(user.password)
 

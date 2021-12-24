@@ -13,12 +13,6 @@ class Transaction(db.Model):
     amount = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
-    def __init__(self, sender, recipient, state, amount):
-        self.sender = sender
-        self.recipient = recipient
-        self.state = str(state)
-        self.amount = amount
-
 
 class TransactionSchema(ma.Schema):
     hashID = fields.Str()
