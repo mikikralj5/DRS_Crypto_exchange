@@ -6,7 +6,7 @@ const LandingPage = () => {
   return (
     <div>
       <LandingNav />
-      <div style={{ "text-align": "center", "margin-top": "20rem" }}>
+      <div style={{ textAlign: "center", marginTop: "20rem" }}>
         <img src={coin} alt="Logo" className="logo" />
         <p className="welcome">Welcome to the crypto bros</p>
         <Link to="/register" className="welcome">
