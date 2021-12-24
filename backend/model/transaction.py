@@ -1,5 +1,7 @@
 from config import db, ma
 from marshmallow import Schema, fields
+from enum import Enum
+from .transaction_state import TransactionState
 
 
 class Transaction(db.Model):
@@ -7,7 +9,7 @@ class Transaction(db.Model):
     hashID = db.Column(db.String(256), primary_key=True)
     sender = db.Column(db.String(50))
     recipient = db.Column(db.String(50))
-    state = db.Column(db.String(50))
+    state = db.Column(db.String(10))
     amount = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 

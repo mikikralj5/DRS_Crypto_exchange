@@ -85,21 +85,43 @@ def send_mail(user):
     mail.send(msg)
 
 
+# @app.route("/createTransaction")
+# def create_transaction():
+
+
+@app.route("/sortTransactions")
+def sort_function():
+    sort_by = request.json["sort_by"]#recipient,state,amount
+    sort_type = request.json["sort_type"]
+
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    all_transactions = user.transactions
+
+    if sort_type == "Asc":
+        all_transactions.sort(key=sort_by)
+    else:
+        all_transactions.sort(key=sort_by, reversed=True)
+
+
+
 @app.route("/getTransactions")
 def get_transactions():
     user_id = session.get("user_id")
     user = User.query.get(user_id)
     all_transactions = user.transactions
-    results = Transaction.dump(all_transactions)  # ako vracam vise
+    schema = TransactionSchema(many=True)# ako vracam vise
+    results = schema.dump(all_transactions)
     return jsonify(results)
 
 
 @app.route("/getCrypto")#pregled stanja
 def get_crypto():
     user_id = session.get("user_id")
-    crypto_account = CryptoAccount.query.filter_by(user_id=user_id).first()#menjaj
+    crypto_account = CryptoAccount.query.filter_by(user_id=user_id).first()
     all_crypto_currencies = crypto_account.crypto_currencies
-    results = CryptoCurrencySchema.dump(all_crypto_currencies)  # ako vracam vise ovde pukne
+    schema = CryptoCurrencySchema(many=True)
+    results = schema.dump(all_crypto_currencies)
     return jsonify(results)
 
 
