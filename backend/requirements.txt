@@ -10,3 +10,4 @@ marshmallow-sqlalchemy
 flask-cors
 flask-mail
 pysha3
+requests
