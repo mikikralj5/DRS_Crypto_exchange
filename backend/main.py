@@ -1,4 +1,5 @@
 import bcrypt
+import sqlalchemy
 from flask import Flask, jsonify, request, abort, session, Response
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -6,12 +7,18 @@ from flask_mail import Mail, Message
 from flask_session import Session
 from werkzeug.utils import redirect
 import random
+import _thread
 from random import randint
 import requests
 import string
+import sqlite3
+from time import sleep
 import json
 from sha3 import keccak_256
 from model.transaction_state import TransactionState
+from sqlalchemy import engine, MetaData, Table
+from sqlalchemy.orm import sessionmaker
+from config import os
 
 from model.user import User, UserSchema
 from model.transaction import Transaction, TransactionSchema
@@ -20,7 +27,7 @@ from model.crypto_currency import CryptoCurrency, CryptoCurrencySchema
 from model.crypto_account import CryptoAccount, CryptoAccountSchema
 
 
-from config import db, ma, ApplicationConfig
+from config import db, ma, ApplicationConfig, SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -202,44 +209,30 @@ def exchange():
     return Response(status=200)
 
 
+def mining(transaction_id):
+    sleep(5*60)
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(
+    basedir, "CryptoDB.db"))
+    local_session = sqlalchemy.orm.Session(bind=engine)
+    transaction = local_session.query(Transaction).get(transaction_id)
+    transaction.state = TransactionState.DONE.value
+    local_session.commit()
 
+@app.route("/updateTransactionState", methods=["PATCH"])
+def update_transaction_state():
+    transaction_id = request.json["transaction_id"]
+    state = request.json["state"]
+    transaction = Transaction.query.get(transaction_id)
+    if TransactionState[state].value == "IN_PROGRESS":
+        transaction.state = TransactionState.IN_PROGRESS.value
+        db.session.commit()
+        _thread.start_new_thread(mining, (transaction_id,))
+    else:
+        transaction.state = TransactionState.REJECTED.value
+        db.session.commit()
 
-
-#
-# @app.route("/exchange")
-# def exchange():
-#     crypto_currency = request.json["crypto_currency"]
-#     amount = request.json["amount"]
-#     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
-#     parameters = {"symbol": crypto_currency, "convert": "USD"}
-#     headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
-#     sess = requests.Session()
-#     sess.headers.update(headers)
-#
-#     response = sess.get(url, params=parameters)
-#     usd_price = response.json()["data"][crypto_currency]["quote"]["USD"]["price"]
-#
-#     sum_to_pay = usd_price * amount
-#
-#     user_id = session.get("user_id")
-#     user = User.query.get(user_id)
-#     crypto_account = user.crypto_account
-#
-#     if sum_to_pay > crypto_account.amount:
-#         return {"error": "you don't have enough money"}, 400
-#
-#     crypto_account.amount -= sum_to_pay
-#     crypto_currencies = crypto_account.crypto_currencies
-#     iterator = filter(lambda x: x.name == crypto_currency, crypto_currencies)
-#     crypto_currencies = list(iterator) # da bi vratio listu ovo ogre je iterator
-#     if crypto_currencies == []:
-#         create_crypto_currency(amount, crypto_currency, crypto_account)
-#     else:
-#         update_crypto_currency(crypto_currency, amount, crypto_currencies)
-#
-#     return Response(status=200)
-
-#def maining(transaction):
+    return Response(status=200)
 
 
 @app.route("/createTransaction", methods=["POST"])
@@ -253,8 +246,7 @@ def create_transaction():
         generated_string = "" + user.email + recipient_email + str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
 
-        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, state=TransactionState.IN_PROGRESS.value, user_id=user_id, user=user)
-        #maining(transaction)#nit proces nesto
+        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, user_id=user_id, user=user)
         db.session.add(transaction)
         db.session.commit()
         return Response(status=200)
@@ -263,7 +255,7 @@ def create_transaction():
 
 
 @app.route("/filterTransaction")
-def filter_fucntion():
+def filter_transaction():
     filter_by = request.json["filter_by"]
     value = request.json["value"]
     user_id = session.get("user_id")
