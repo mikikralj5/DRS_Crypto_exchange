@@ -130,7 +130,7 @@ def update_crypto_currency(name, amount, crypto_currencies):
     return
 
 
-def create_crypto_currency(amount, name, crypto_account):
+def create_crypto_currency(name, amount, crypto_account):
     crypto_currency = CryptoCurrency(amount=amount, name=name, account_id=crypto_account.id)
     db.session.add(crypto_currency)
     db.session.commit()
@@ -139,36 +139,105 @@ def create_crypto_currency(amount, name, crypto_account):
 
 @app.route("/exchange")
 def exchange():
-    crypto_currency = request.json["crypto_currency"]
+    sell = request.json["sell"]
+    buy = request.json["buy"]
     amount = request.json["amount"]
-    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
-    parameters = {"symbol": crypto_currency, "convert": "USD"}
-    headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
-    sess = requests.Session()
-    sess.headers.update(headers)
 
-    response = sess.get(url, params=parameters)
-    usd_price = response.json()["data"][crypto_currency]["quote"]["USD"]["price"]
-
-    sum_to_pay = usd_price * amount
+    if buy == "USD":
+        url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+        parameters = {"symbol": sell, "convert": buy}
+        headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
+        sess = requests.Session()
+        sess.headers.update(headers)
+        response = sess.get(url, params=parameters)
+        price = response.json()["data"][sell]["quote"][buy]["price"]
+    else:
+        url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+        parameters = {"symbol": buy, "convert": sell}
+        headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
+        sess = requests.Session()
+        sess.headers.update(headers)
+        response = sess.get(url, params=parameters)
+        price = response.json()["data"][buy]["quote"][sell]["price"]
 
     user_id = session.get("user_id")
     user = User.query.get(user_id)
     crypto_account = user.crypto_account
+    sum_to_pay = price * amount
 
-    if sum_to_pay > crypto_account.amount:
-        return {"error": "you don't have enough money"}, 400
+    if sell == "USD":
+        if sum_to_pay > crypto_account.amount:
+            return {"error": "you don't have enough money"}, 400
+        crypto_account.amount -= sum_to_pay
+        crypto_currencies = crypto_account.crypto_currencies
+        iterator = filter(lambda x: x.name == buy, crypto_currencies)
+        crypto_currencies = list(iterator)  # da bi vratio listu ovo ogre je iterator
+        if crypto_currencies == []:
+            create_crypto_currency(buy, amount, crypto_account)
+        else:
+            update_crypto_currency(buy, amount, crypto_currencies)
+    elif buy == "USD":
+        crypto_currencies = crypto_account.crypto_currencies
+        crypto_currency = next(filter(lambda x: x.name == sell, crypto_currencies), None)
+        if sum_to_pay > crypto_currency.amount:
+            return {"error": "you don't have enough crypto currency"}, 400
+        crypto_currency.amount -= sum_to_pay
+        crypto_account.amount += amount
+        db.session.commit()
 
-    crypto_account.amount -= sum_to_pay
-    crypto_currencies = crypto_account.crypto_currencies
-    iterator = filter(lambda x: x.name == crypto_currency, crypto_currencies)
-    crypto_currencies = list(iterator) # da bi vratio listu ovo ogre je iterator
-    if crypto_currencies == []:
-        create_crypto_currency(amount, crypto_currency, crypto_account)
     else:
-        update_crypto_currency(crypto_currency, amount, crypto_currencies)
+        crypto_currencies = crypto_account.crypto_currencies
+        crypto_currency = next(filter(lambda x: x.name == sell, crypto_currencies), None)
+        if sum_to_pay > crypto_currency.amount:
+            return {"error": "you don't have enough crypto currency"}, 400
+        crypto_currency.amount -= sum_to_pay
+        crypto_currencies = crypto_account.crypto_currencies
+        iterator = filter(lambda x: x.name == buy, crypto_currencies)
+        crypto_currencies = list(iterator)  # da bi vratio listu ovo ogre je iterator
+        if crypto_currencies == []:
+            create_crypto_currency(buy, amount, crypto_account)
+        else:
+            update_crypto_currency(buy, amount, crypto_currencies)
 
     return Response(status=200)
+
+
+
+
+
+#
+# @app.route("/exchange")
+# def exchange():
+#     crypto_currency = request.json["crypto_currency"]
+#     amount = request.json["amount"]
+#     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+#     parameters = {"symbol": crypto_currency, "convert": "USD"}
+#     headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
+#     sess = requests.Session()
+#     sess.headers.update(headers)
+#
+#     response = sess.get(url, params=parameters)
+#     usd_price = response.json()["data"][crypto_currency]["quote"]["USD"]["price"]
+#
+#     sum_to_pay = usd_price * amount
+#
+#     user_id = session.get("user_id")
+#     user = User.query.get(user_id)
+#     crypto_account = user.crypto_account
+#
+#     if sum_to_pay > crypto_account.amount:
+#         return {"error": "you don't have enough money"}, 400
+#
+#     crypto_account.amount -= sum_to_pay
+#     crypto_currencies = crypto_account.crypto_currencies
+#     iterator = filter(lambda x: x.name == crypto_currency, crypto_currencies)
+#     crypto_currencies = list(iterator) # da bi vratio listu ovo ogre je iterator
+#     if crypto_currencies == []:
+#         create_crypto_currency(amount, crypto_currency, crypto_account)
+#     else:
+#         update_crypto_currency(crypto_currency, amount, crypto_currencies)
+#
+#     return Response(status=200)
 
 #def maining(transaction):
 
