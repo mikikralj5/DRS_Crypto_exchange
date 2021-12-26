@@ -372,10 +372,10 @@ def login_user():
     return user_schema.jsonify(user)
 
 
-@app.route("/logout")
+@app.route("/logout", methods = ["POST"])
 def logout_user():
     session.pop("user_id")
-    return "Successfully logged out", 200
+    return "200"
 
 
 @app.route("/@me")

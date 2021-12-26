@@ -1,5 +1,6 @@
 import { React, useState } from "react";
 import APIService from "./APIService";
+import { useNavigate } from "react-router-dom";
 
 const RegistrationForm = () => {
   const [name, setName] = useState("");
@@ -10,6 +11,8 @@ const RegistrationForm = () => {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
+
+  const navigate = useNavigate();
 
   const registerUser = () => {
     APIService.RegisterNewUser({
@@ -22,6 +25,8 @@ const RegistrationForm = () => {
       country,
       city,
     });
+
+    navigate("/");
   };
 
   return (

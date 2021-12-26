@@ -1,6 +1,19 @@
 import React from "react";
-import { User } from "../Types";
+import { Link } from "react-router-dom";
+
 const MainPage = () => {
+  const logOut = async () => {
+    const resp = await fetch("http://127.0.0.1:5000/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(),
+    });
+
+    console.log(resp);
+  };
+
   return (
     <main className="app">
       <div className="balance">
@@ -11,8 +24,12 @@ const MainPage = () => {
           </p>
         </div>
         <p className="balance__value">0000€</p>
-      </div>
+        {/* <Link to="/" className="welcome" onClick={() => logOut()}>
+          Log out
+        </Link> */}
 
+        <button onClick={() => logOut()}>logout</button>
+      </div>
       <div className="movements">
         <div className="movements__row">
           <div className="movements__type movements__type--deposit">
@@ -29,7 +46,6 @@ const MainPage = () => {
           <div className="movements__value">-378€</div>
         </div>
       </div>
-
       <div className="summary">
         <p className="summary__label">In</p>
         <p className="summary__value summary__value--in">0000€</p>
@@ -39,7 +55,6 @@ const MainPage = () => {
         <p className="summary__value summary__value--interest">0000€</p>
         <button className="btn--sort">&downarrow; SORT</button>
       </div>
-
       <div className="operation operation--transfer">
         <h2>Transfer money</h2>
         <form className="form form--transfer">
@@ -50,7 +65,6 @@ const MainPage = () => {
           <label className="form__label">Amount</label>
         </form>
       </div>
-
       <div className="operation operation--loan">
         <h2>Request loan</h2>
         <form className="form form--loan">
@@ -62,7 +76,6 @@ const MainPage = () => {
           <label className="form__label form__label--loan">Amount</label>
         </form>
       </div>
-
       <div className="operation operation--close">
         <h2>Close account</h2>
         <form className="form form--close">

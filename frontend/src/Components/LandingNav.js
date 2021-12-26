@@ -9,8 +9,6 @@ const LandingNav = () => {
   const navigate = useNavigate();
 
   const logInUser = async () => {
-    console.log(email, password);
-
     const resp = await fetch("http://127.0.0.1:5000/login", {
       method: "POST",
       headers: {
@@ -18,8 +16,6 @@ const LandingNav = () => {
       },
       body: JSON.stringify({ email, password }),
     });
-
-    const data = await resp.json();
 
     setEmail("");
     setPassword("");
@@ -53,7 +49,7 @@ const LandingNav = () => {
         />
 
         <input
-          type="text"
+          type="password"
           placeholder="password"
           className="login__input login__input--pin"
           value={password}
