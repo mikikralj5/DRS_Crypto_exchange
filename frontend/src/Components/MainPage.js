@@ -10,6 +10,9 @@ const MainPage = () => {
   const [toShow, setToShow] = useState("all");
   const [currencyAll, setCurrencyAll] = useState([]);
   const [currencySymbols, setCurrencySymbols] = useState([]);
+  const [currencySymbolsUsd, setCurrencySymbolsUsd] = useState([]);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+
   const logOut = async () => {
     const resp = await httpClient.post("http://127.0.0.1:5000/logout");
     navigate("/");
@@ -22,12 +25,17 @@ const MainPage = () => {
     };
 
     getUser();
-  }, []);
+  }, [paymentAmount]);
 
   useEffect(() => {
     const getSymbol = async () => {
-      const resp = await httpClient.get("http://127.0.0.1:5000/showCrypto");
+      const resp = await httpClient.get(
+        "http://127.0.0.1:5000/showCryptoSymbols"
+      );
+
+      const data = ["USD", ...resp.data];
       setCurrencySymbols(resp.data);
+      setCurrencySymbolsUsd(data);
     };
 
     getSymbol();
@@ -83,23 +91,26 @@ const MainPage = () => {
           <label className="form__label">Currency</label>
         </form>
       </div>
-      <BankImport />
+      <BankImport amount={paymentAmount} setAmount={setPaymentAmount} />
       <div className="operation operation--close">
-        <h2>Currency change</h2>
+        <h2>Currency exchange</h2>
         <form className="form form--close">
           <input type="text" className="form__input form__input--to" />
-          <select
-            name="currency"
-            className="form__input form__input--to"
-          ></select>
-          <select
-            name="currency"
-            className="form__input form__input--to"
-          ></select>
+          <select name="currency" className="form__input form__input--to">
+            {" "}
+            {currencySymbolsUsd.map((symbol) => (
+              <option>{symbol}</option>
+            ))}
+          </select>
+          <select name="currency" className="form__input form__input--to">
+            {currencySymbolsUsd.map((symbol) => (
+              <option>{symbol}</option>
+            ))}
+          </select>
           <button className="form__btn form__btn--close">&rarr;</button>
-          <label className="form__label">Amount</label>
-          <label className="form__label">From</label>
-          <label className="form__label">To</label>
+          <label className="form__label">Amount to buy</label>
+          <label className="form__label">Buy</label>
+          <label className="form__label">Sell</label>
         </form>
       </div>
     </main>

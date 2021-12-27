@@ -95,8 +95,8 @@ def deposit():
     user = User.query.get(user_id)
     payment_card = user.payment_card
     crypto_account = user.crypto_account
-    payment_card.money_amount -= amount
-    crypto_account.amount += amount
+    payment_card.money_amount -= int(amount)
+    crypto_account.amount += int(amount)
     db.session.commit()
 
     return Response(status=200)
@@ -163,7 +163,7 @@ def get_crypto_value():
     return crypto_value_list, 200
 
 
-@app.route("/showCrypto")
+@app.route("/showCryptoSymbols")
 def get_all_crypto_currencies():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
     #parameters = {"start": 1, "limit": 5000}
