@@ -144,6 +144,41 @@ def create_crypto_currency(name, amount, crypto_account):
     return
 
 
+@app.route("/showCrypto_symbols")
+def get_crypto_value():
+    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
+    # parameters = {"start": 1, "limit": 5000}
+    headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
+    sess = requests.Session()
+    sess.headers.update(headers)
+    response = sess.get(url)
+    json_response = response.json()
+    crypto_value_list = []
+    for crypto in json_response["data"]:
+        name = str(crypto["name"])
+        symbol = str(crypto["symbol"])
+        value = crypto["quote"]["USD"]["price"]
+        crypto_value_list.append({"name": name, "symbol": symbol, "value": value})
+    crypto_value_list = json.dumps(crypto_value_list)
+    return crypto_value_list
+
+
+@app.route("/showCrypto")
+def get_all_crypto_currencies():
+    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
+    #parameters = {"start": 1, "limit": 5000}
+    headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
+    sess = requests.Session()
+    sess.headers.update(headers)
+    response = sess.get(url)
+    json_response = response.json()
+    crypto_list = []
+    for i in range(len(json_response["data"])):
+        crypto_list.append(str(json_response["data"][i]["symbol"]))
+    crypto_list = json.dumps(crypto_list)
+    return crypto_list
+
+
 @app.route("/exchange")
 def exchange():
     sell = request.json["sell"]
@@ -218,6 +253,7 @@ def mining(transaction_id):
     transaction = local_session.query(Transaction).get(transaction_id)
     transaction.state = TransactionState.DONE.value
     local_session.commit()
+
 
 @app.route("/updateTransactionState", methods=["PATCH"])
 def update_transaction_state():

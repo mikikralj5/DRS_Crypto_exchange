@@ -20,6 +20,7 @@ class ApplicationConfig:
     basedir, "CryptoDB.db"
 )
 
+    SESSION_COOKIE_SECURE = True
     SESSION_TYPE = "redis"
     SESSION_PERMANENT = False
     SESSION_USE_SIGNER = True
