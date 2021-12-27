@@ -1,17 +1,42 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import httpClient from "../httpClient";
+import { useNavigate } from "react-router-dom";
+import CryptoAllList from "./CryptoAllList";
+import BankImport from "./BankImport";
 
 const MainPage = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState();
+  const [toShow, setToShow] = useState("all");
+  const [currencyAll, setCurrencyAll] = useState([]);
+  const [currencySymbols, setCurrencySymbols] = useState([]);
   const logOut = async () => {
-    const resp = await fetch("http://127.0.0.1:5000/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(),
-    });
+    const resp = await httpClient.post("http://127.0.0.1:5000/logout");
+    navigate("/");
+  };
 
-    console.log(resp);
+  useEffect(() => {
+    const getUser = async () => {
+      const resp = await httpClient.get("http://127.0.0.1:5000/@me");
+      setUser(resp.data);
+    };
+
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    const getSymbol = async () => {
+      const resp = await httpClient.get("http://127.0.0.1:5000/showCrypto");
+      setCurrencySymbols(resp.data);
+    };
+
+    getSymbol();
+  }, []);
+
+  const showCurrencyAll = async () => {
+    setToShow("all");
+    const resp = await httpClient.get("http://127.0.0.1:5000/showCrypto_all");
+    setCurrencyAll(resp.data);
   };
 
   return (
@@ -23,67 +48,58 @@ const MainPage = () => {
             As of <span className="date">05/03/2037</span>
           </p>
         </div>
-        <p className="balance__value">0000€</p>
-        {/* <Link to="/" className="welcome" onClick={() => logOut()}>
-          Log out
-        </Link> */}
+        <p className="balance__value">
+          {user != null ? Math.round(user.crypto_account.amount) : 0}$
+        </p>
 
-        <button onClick={() => logOut()}>logout</button>
+        <button className="btn" onClick={logOut}>
+          logout
+        </button>
       </div>
       <div className="movements">
-        <div className="movements__row">
-          <div className="movements__type movements__type--deposit">
-            2 deposit
-          </div>
-          <div className="movements__date">3 days ago</div>
-          <div className="movements__value">4 000€</div>
-        </div>
-        <div className="movements__row">
-          <div className="movements__type movements__type--withdrawal">
-            1 withdrawal
-          </div>
-          <div className="movements__date">24/01/2037</div>
-          <div className="movements__value">-378€</div>
-        </div>
+        {toShow === "all" ? <CryptoAllList cryptoList={currencyAll} /> : null}
       </div>
       <div className="summary">
-        <p className="summary__label">In</p>
-        <p className="summary__value summary__value--in">0000€</p>
-        <p className="summary__label">Out</p>
-        <p className="summary__value summary__value--out">0000€</p>
-        <p className="summary__label">Interest</p>
-        <p className="summary__value summary__value--interest">0000€</p>
-        <button className="btn--sort">&downarrow; SORT</button>
+        <button className="btn btn--show" onClick={showCurrencyAll}>
+          Show currency states
+        </button>
+        <button className="btn btn--show">Show transactions</button>
+        <button className="btn btn--show">Show crypto</button>
+        <button className="btn btn--show">Show transaction requests</button>
       </div>
       <div className="operation operation--transfer">
-        <h2>Transfer money</h2>
+        <h2>Transfer</h2>
         <form className="form form--transfer">
           <input type="text" className="form__input form__input--to" />
-          <input type="number" className="form__input form__input--amount" />
+          <input type="text" className="form__input form__input--to" />
+          <select name="currency" className="form__input form__input--to">
+            {currencySymbols.map((symbol) => (
+              <option>{symbol}</option>
+            ))}
+          </select>
           <button className="form__btn form__btn--transfer">&rarr;</button>
           <label className="form__label">Transfer to</label>
           <label className="form__label">Amount</label>
+          <label className="form__label">Currency</label>
         </form>
       </div>
-      <div className="operation operation--loan">
-        <h2>Request loan</h2>
-        <form className="form form--loan">
-          <input
-            type="number"
-            className="form__input form__input--loan-amount"
-          />
-          <button className="form__btn form__btn--loan">&rarr;</button>
-          <label className="form__label form__label--loan">Amount</label>
-        </form>
-      </div>
+      <BankImport />
       <div className="operation operation--close">
-        <h2>Close account</h2>
+        <h2>Currency change</h2>
         <form className="form form--close">
-          <input type="text" className="form__input form__input--user" />
-          <input type="password" className="form__input form__input--pin" />
+          <input type="text" className="form__input form__input--to" />
+          <select
+            name="currency"
+            className="form__input form__input--to"
+          ></select>
+          <select
+            name="currency"
+            className="form__input form__input--to"
+          ></select>
           <button className="form__btn form__btn--close">&rarr;</button>
-          <label className="form__label">Confirm user</label>
-          <label className="form__label">Confirm PIN</label>
+          <label className="form__label">Amount</label>
+          <label className="form__label">From</label>
+          <label className="form__label">To</label>
         </form>
       </div>
     </main>

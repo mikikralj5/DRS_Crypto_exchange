@@ -31,7 +31,7 @@ from config import db, ma, ApplicationConfig, SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
-CORS(app)
+CORS(app, supports_credentials = True)
 
 # basedir = os.path.abspath(os.path.dirname(__file__))
 # app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
@@ -95,7 +95,7 @@ def deposit():
     user = User.query.get(user_id)
     payment_card = user.payment_card
     crypto_account = user.crypto_account
-    payment_card.amount -= amount
+    payment_card.money_amount -= amount
     crypto_account.amount += amount
     db.session.commit()
 
@@ -144,7 +144,7 @@ def create_crypto_currency(name, amount, crypto_account):
     return
 
 
-@app.route("/showCrypto_symbols")
+@app.route("/showCrypto_all")
 def get_crypto_value():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
     # parameters = {"start": 1, "limit": 5000}
@@ -160,7 +160,7 @@ def get_crypto_value():
         value = crypto["quote"]["USD"]["price"]
         crypto_value_list.append({"name": name, "symbol": symbol, "value": value})
     crypto_value_list = json.dumps(crypto_value_list)
-    return crypto_value_list
+    return crypto_value_list, 200
 
 
 @app.route("/showCrypto")

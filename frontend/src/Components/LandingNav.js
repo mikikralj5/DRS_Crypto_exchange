@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { resolvePath, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import httpClient from "../httpClient";
 
 const LandingNav = () => {
   const [email, setEmail] = useState("");
@@ -9,23 +10,22 @@ const LandingNav = () => {
   const navigate = useNavigate();
 
   const logInUser = async () => {
-    const resp = await fetch("http://127.0.0.1:5000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const resp = await httpClient.post("http://127.0.0.1:5000/login", {
+        email,
+        password,
+      });
+
+      console.log(resp.data);
+      navigate("/mainPage");
+    } catch (error) {
+      if (error.response.status === 401) {
+        setErr(true);
+      }
+    }
 
     setEmail("");
     setPassword("");
-
-    if (resp.status == 401) {
-      console.log("invalid credentials");
-      setErr(true);
-    } else {
-      navigate("/mainPage");
-    }
   };
   return (
     <nav>

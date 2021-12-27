@@ -67,6 +67,11 @@ body {
   width: 100%;
 }
 
+.btn--show {
+  background-color: rgb(214, 212, 212);
+  color: #000;
+}
+
 /* jonas css*/
 /*
  * Use this CSS to learn some intersting techniques,
@@ -157,7 +162,7 @@ nav {
 /* MAIN */
 .app {
   position: relative;
-  max-width: 100rem;
+  max-width: 120rem;
   margin: 4rem auto;
   display: grid;
   grid-template-columns: 4fr 3fr;
@@ -268,7 +273,7 @@ nav {
   margin-left: auto;
   border: none;
   background: none;
-  font-size: 1.3rem;
+  font-size: 2rem;
   font-weight: 500;
   cursor: pointer;
 }
@@ -301,7 +306,7 @@ h2 {
 
 .form {
   display: grid;
-  grid-template-columns: 2.5fr 2.5fr 1fr;
+  grid-template-columns: 2.5fr 2.5fr 2.5fr 1fr;
   grid-template-rows: auto auto;
   gap: 0.4rem 1rem;
 }

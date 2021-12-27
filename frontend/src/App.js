@@ -1,6 +1,5 @@
 import LandingPage from "./Components/LandingPage";
 import RegistrationForm from "./Components/RegistrationForm";
-import LoginPage from "./Components/LoginPage";
 import MainPage from "./Components/MainPage";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
