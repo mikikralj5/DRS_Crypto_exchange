@@ -143,15 +143,15 @@ def create_crypto_currency(name, amount, crypto_account):
     db.session.commit()
     return
 
-
-@app.route("/gettransactionRequests")
-def get_transaction_requests():
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    transactions = Transaction.query.filter_by(recipient=user.email)
-    schema = TransactionSchema(many=True)# ako vracam vise
-    results = schema.dump(transactions)
-    return jsonify(results)
+#
+# @app.route("/gettransactionRequests")
+# def get_transaction_requests():
+#     user_id = session.get("user_id")
+#     user = User.query.get(user_id)
+#     transactions = Transaction.query.filter_by(recipient=user.email)
+#     schema = TransactionSchema(many=True)# ako vracam vise
+#     results = schema.dump(transactions)
+#     return jsonify(results)
 
 
 @app.route("/showCrypto_all")
@@ -255,15 +255,28 @@ def exchange():
     return Response(status=200)
 
 
-def mining(transaction_id):
+def mining(transaction_id, crypto_name, amount):
     sleep(5*60)
     basedir = os.path.abspath(os.path.dirname(__file__))
     engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(
     basedir, "CryptoDB.db"))
     local_session = sqlalchemy.orm.Session(bind=engine)
+
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    crypto_account = user.crypto_account
+    crypto_currencies = crypto_account.crypto_currencies
+    iterator = filter(lambda x: x.name == crypto_name, crypto_currencies)
+    crypto_currencies = list(iterator)  # da bi vratio listu ovo ogre je iterator
+    if crypto_currencies == []:
+        create_crypto_currency(crypto_name, amount, crypto_account)
+    else:
+        update_crypto_currency(crypto_name, amount, crypto_currencies)
+
     transaction = local_session.query(Transaction).get(transaction_id)
     transaction.state = TransactionState.DONE.value
     local_session.commit()
+    return Response(status=200)
 
 
 @app.route("/updateTransactionState", methods=["PATCH"])
@@ -274,7 +287,7 @@ def update_transaction_state():
     if TransactionState[state].value == "IN_PROGRESS":
         transaction.state = TransactionState.IN_PROGRESS.value
         db.session.commit()
-        _thread.start_new_thread(mining, (transaction_id,))
+        _thread.start_new_thread(mining, (transaction_id, transaction.cryptocurrency, transaction.amount))
     else:
         transaction.state = TransactionState.REJECTED.value
         db.session.commit()
@@ -300,7 +313,6 @@ def create_transaction():
         return Response(status=200)
     else:
         return "User with that email doesn't exist", 400
-
 
 
 @app.route("/filterTransaction")
@@ -341,6 +353,8 @@ def get_transactions():
     user_id = session.get("user_id")
     user = User.query.get(user_id)
     all_transactions = user.transactions
+    iterator = filter(lambda x: x.state != TransactionState.WAITING_FOR_USER.value, all_transactions)
+    all_transactions = list(iterator)  # da bi vratio listu ovo ogre je iterator
     schema = TransactionSchema(many=True)# ako vracam vise
     results = schema.dump(all_transactions)
     return jsonify(results)
@@ -435,7 +449,7 @@ def get_current_user():
         return jsonify({"error" : "Unauthorized"}), 401
 
     user = User.query.filter_by(id=user_id).first()
-    return user_schema.jsonify(user)
+    return user_schema.jsonify(user.email)
     
 
 @app.route("/updateUser", methods=["PUT"])#put ili patch
