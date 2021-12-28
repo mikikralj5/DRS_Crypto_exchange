@@ -11,6 +11,7 @@ class Transaction(db.Model):
     recipient = db.Column(db.String(50))
     state = db.Column(db.String(10))
     amount = db.Column(db.Integer)
+    cryptocurrency = db.Column(db.String(10))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     # crypto_currency = db.relationship("CryptoCurrency", backref="crypto_currency", uselist=False)
     #stavi ga kao string
@@ -22,3 +23,4 @@ class TransactionSchema(ma.Schema):
     recipient = fields.Str()
     state = fields.Str()
     amount = fields.Number()
+    cryptocurrency = fields.Str()

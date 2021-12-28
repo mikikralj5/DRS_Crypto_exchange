@@ -285,7 +285,8 @@ def update_transaction_state():
 @app.route("/createTransaction", methods=["POST"])
 def create_transaction():
     recipient_email = request.json["recipient_email"]
-    amount = request.json["amount"]
+    amount = int(request.json["amount"])
+    cryptocurrency = request.json["cryptocurrency"]
     if user_exists(recipient_email) is True:
         user_id = session.get("user_id")
         user = User.query.get(user_id)
@@ -293,12 +294,13 @@ def create_transaction():
         generated_string = "" + user.email + recipient_email + str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
 
-        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, user_id=user_id, user=user)
+        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user)
         db.session.add(transaction)
         db.session.commit()
         return Response(status=200)
     else:
         return "User with that email doesn't exist", 400
+
 
 
 @app.route("/filterTransaction")
