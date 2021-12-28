@@ -3,29 +3,45 @@ import httpClient from "../httpClient";
 import { useNavigate } from "react-router-dom";
 import CryptoAllList from "./CryptoAllList";
 import BankImport from "./BankImport";
+import CurrencyExchange from "./CurrencyExchange";
+import Transfer from "./Transfer";
+import UserCryptoList from "./UserCryptoList";
 
 const MainPage = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState();
+  const [userMoney, setUserMoney] = useState(0);
   const [toShow, setToShow] = useState("all");
   const [currencyAll, setCurrencyAll] = useState([]);
   const [currencySymbols, setCurrencySymbols] = useState([]);
   const [currencySymbolsUsd, setCurrencySymbolsUsd] = useState([]);
-  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [userCryptoList, setUserCryptoList] = useState([]);
+
+  const today = new Date();
+  const date =
+    today.getDay() + "/" + today.getMonth() + "/" + today.getFullYear();
 
   const logOut = async () => {
     const resp = await httpClient.post("http://127.0.0.1:5000/logout");
     navigate("/");
   };
 
+  // useEffect(() => {
+  //   const getUser = async () => {
+  //     const resp = await httpClient.get("http://127.0.0.1:5000/@me");
+  //   };
+
+  //   getUser();
+  // }, []);
+
   useEffect(() => {
-    const getUser = async () => {
-      const resp = await httpClient.get("http://127.0.0.1:5000/@me");
-      setUser(resp.data);
+    const getUserMoney = async () => {
+      const resp = await httpClient("http://127.0.0.1:5000/getMoney");
+
+      setUserMoney(resp.data.value);
     };
 
-    getUser();
-  }, [paymentAmount]);
+    getUserMoney();
+  }, [userMoney]);
 
   useEffect(() => {
     const getSymbol = async () => {
@@ -41,6 +57,12 @@ const MainPage = () => {
     getSymbol();
   }, []);
 
+  const showUserCrypto = async () => {
+    setToShow("userCrypto");
+    const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
+    setUserCryptoList(resp.data);
+  };
+
   const showCurrencyAll = async () => {
     setToShow("all");
     const resp = await httpClient.get("http://127.0.0.1:5000/showCrypto_all");
@@ -53,12 +75,10 @@ const MainPage = () => {
         <div>
           <p className="balance__label">Current balance</p>
           <p className="balance__date">
-            As of <span className="date">05/03/2037</span>
+            As of <span className="date">{date}</span>
           </p>
         </div>
-        <p className="balance__value">
-          {user != null ? Math.round(user.crypto_account.amount) : 0}$
-        </p>
+        <p className="balance__value">{Math.round(userMoney)}$</p>
 
         <button className="btn" onClick={logOut}>
           logout
@@ -66,53 +86,26 @@ const MainPage = () => {
       </div>
       <div className="movements">
         {toShow === "all" ? <CryptoAllList cryptoList={currencyAll} /> : null}
+        {toShow === "userCrypto" ? (
+          <UserCryptoList
+            userCryptoList={userCryptoList}
+            currencyAll={currencyAll}
+          />
+        ) : null}
       </div>
       <div className="summary">
         <button className="btn btn--show" onClick={showCurrencyAll}>
           Show currency states
         </button>
         <button className="btn btn--show">Show transactions</button>
-        <button className="btn btn--show">Show crypto</button>
+        <button className="btn btn--show" onClick={showUserCrypto}>
+          Show crypto
+        </button>
         <button className="btn btn--show">Show transaction requests</button>
       </div>
-      <div className="operation operation--transfer">
-        <h2>Transfer</h2>
-        <form className="form form--transfer">
-          <input type="text" className="form__input form__input--to" />
-          <input type="text" className="form__input form__input--to" />
-          <select name="currency" className="form__input form__input--to">
-            {currencySymbols.map((symbol) => (
-              <option>{symbol}</option>
-            ))}
-          </select>
-          <button className="form__btn form__btn--transfer">&rarr;</button>
-          <label className="form__label">Transfer to</label>
-          <label className="form__label">Amount</label>
-          <label className="form__label">Currency</label>
-        </form>
-      </div>
-      <BankImport amount={paymentAmount} setAmount={setPaymentAmount} />
-      <div className="operation operation--close">
-        <h2>Currency exchange</h2>
-        <form className="form form--close">
-          <input type="text" className="form__input form__input--to" />
-          <select name="currency" className="form__input form__input--to">
-            {" "}
-            {currencySymbolsUsd.map((symbol) => (
-              <option>{symbol}</option>
-            ))}
-          </select>
-          <select name="currency" className="form__input form__input--to">
-            {currencySymbolsUsd.map((symbol) => (
-              <option>{symbol}</option>
-            ))}
-          </select>
-          <button className="form__btn form__btn--close">&rarr;</button>
-          <label className="form__label">Amount to buy</label>
-          <label className="form__label">Buy</label>
-          <label className="form__label">Sell</label>
-        </form>
-      </div>
+      <Transfer currencySymbols={currencySymbols} />
+      <BankImport userMoney={userMoney} setUserMoney={setUserMoney} />
+      <CurrencyExchange currencySymbolsUsd={currencySymbolsUsd} />
     </main>
   );
 };

@@ -4,8 +4,8 @@ import CryptoAll from "./CryptoAll";
 const CryptoAllList = ({ cryptoList }) => {
   return (
     <div>
-      {cryptoList.map((currency) => (
-        <CryptoAll currency={currency} />
+      {cryptoList.map((currency, index) => (
+        <CryptoAll currency={currency} key={index} />
       ))}
     </div>
   );

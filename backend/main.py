@@ -179,11 +179,12 @@ def get_all_crypto_currencies():
     return crypto_list
 
 
-@app.route("/exchange")
+@app.route("/exchange", methods=["PATCH"])
 def exchange():
-    sell = request.json["sell"]
-    buy = request.json["buy"]
-    amount = request.json["amount"]
+    sell = request.json["currencySell"]
+    buy = request.json["currencyBuy"]
+    x = request.json["amountToBuy"]
+    amount = int(x)
 
     if buy == "USD":
         url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
@@ -341,6 +342,14 @@ def get_crypto():
     schema = CryptoCurrencySchema(many=True)
     results = schema.dump(all_crypto_currencies)
     return jsonify(results)
+
+
+@app.route("/getMoney") #pregled stanja
+def get_money():
+    user_id = session.get("user_id")
+    crypto_account = CryptoAccount.query.filter_by(user_id=user_id).first()
+    
+    return jsonify({"value" : crypto_account.amount}), 200
 
 
 @app.route("/validateOTP", methods=["PATCH"])
