@@ -15,10 +15,11 @@ const MainPage = () => {
   const [currencySymbols, setCurrencySymbols] = useState([]);
   const [currencySymbolsUsd, setCurrencySymbolsUsd] = useState([]);
   const [userCryptoList, setUserCryptoList] = useState([]);
+  const [amountToBuy, setAmountToBuy] = useState(0); //za exchange
 
   const today = new Date();
   const date =
-    today.getDay() + "/" + today.getMonth() + "/" + today.getFullYear();
+    today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
 
   const logOut = async () => {
     const resp = await httpClient.post("http://127.0.0.1:5000/logout");
@@ -57,16 +58,30 @@ const MainPage = () => {
     getSymbol();
   }, []);
 
+  useEffect(() => {
+    const getCurrencyAll = async () => {
+      const resp = await httpClient.get("http://127.0.0.1:5000/showCrypto_all");
+      setCurrencyAll(resp.data);
+    };
+
+    getCurrencyAll();
+  }, []);
+
+  useEffect(() => {
+    const getUserCrypto = async () => {
+      const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
+      setUserCryptoList(resp.data);
+    };
+
+    getUserCrypto();
+  }, [amountToBuy]);
+
   const showUserCrypto = async () => {
     setToShow("userCrypto");
-    const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
-    setUserCryptoList(resp.data);
   };
 
   const showCurrencyAll = async () => {
     setToShow("all");
-    const resp = await httpClient.get("http://127.0.0.1:5000/showCrypto_all");
-    setCurrencyAll(resp.data);
   };
 
   return (
@@ -105,7 +120,11 @@ const MainPage = () => {
       </div>
       <Transfer currencySymbols={currencySymbols} />
       <BankImport userMoney={userMoney} setUserMoney={setUserMoney} />
-      <CurrencyExchange currencySymbolsUsd={currencySymbolsUsd} />
+      <CurrencyExchange
+        currencySymbolsUsd={currencySymbolsUsd}
+        amountToBuy={amountToBuy}
+        setAmountToBuy={setAmountToBuy}
+      />
     </main>
   );
 };

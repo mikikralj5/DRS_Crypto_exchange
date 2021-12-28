@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import httpClient from "../httpClient";
 
-const CurrencyExchange = ({ currencySymbolsUsd }) => {
-  const [amountToBuy, setAmountToBuy] = useState(0);
+const CurrencyExchange = ({
+  currencySymbolsUsd,
+  amountToBuy,
+  setAmountToBuy,
+}) => {
+  // const [amountToBuy, setAmountToBuy] = useState(0);
   const [currencyBuy, setCurrencyBuy] = useState("USD");
   const [currencySell, setCurrecySell] = useState("USD");
 
@@ -13,6 +17,9 @@ const CurrencyExchange = ({ currencySymbolsUsd }) => {
       amountToBuy,
     });
     console.log(resp.status);
+    setAmountToBuy(0);
+    setCurrecySell("USD");
+    setCurrencyBuy("USD");
     // console.log(amountToBuy);
     // console.log(currencyBuy);
     // console.log(currencySell);
@@ -33,6 +40,7 @@ const CurrencyExchange = ({ currencySymbolsUsd }) => {
           <select
             name="currency"
             className="form__input form__input--to"
+            value={currencyBuy}
             onChange={(e) => {
               setCurrencyBuy(e.target.value);
             }}
@@ -44,6 +52,7 @@ const CurrencyExchange = ({ currencySymbolsUsd }) => {
           <select
             name="currency"
             className="form__input form__input--to"
+            value={currencySell}
             onChange={(e) => {
               setCurrecySell(e.target.value);
             }}
