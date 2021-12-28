@@ -297,9 +297,9 @@ def update_transaction_state():
 
 @app.route("/createTransaction", methods=["POST"])
 def create_transaction():
-    recipient_email = request.json["recipient_email"]
-    amount = int(request.json["amount"])
-    cryptocurrency = request.json["cryptocurrency"]
+    recipient_email = request.json["recepient"]
+    amount = int(request.json["transferAmount"])
+    cryptocurrency = request.json["currencyTransfer"]
     if user_exists(recipient_email) is True:
         user_id = session.get("user_id")
         user = User.query.get(user_id)

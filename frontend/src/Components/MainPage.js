@@ -6,16 +6,22 @@ import BankImport from "./BankImport";
 import CurrencyExchange from "./CurrencyExchange";
 import Transfer from "./Transfer";
 import UserCryptoList from "./UserCryptoList";
+import TransactionList from "./TransactionList";
 
 const MainPage = () => {
   const navigate = useNavigate();
-  const [userMoney, setUserMoney] = useState(0);
   const [toShow, setToShow] = useState("all");
-  const [currencyAll, setCurrencyAll] = useState([]);
   const [currencySymbols, setCurrencySymbols] = useState([]);
   const [currencySymbolsUsd, setCurrencySymbolsUsd] = useState([]);
+
+  const [currencyAll, setCurrencyAll] = useState([]);
   const [userCryptoList, setUserCryptoList] = useState([]);
+  const [userTransactions, setUserTransactions] = useState([]);
+
+  //dependencies
   const [amountToBuy, setAmountToBuy] = useState(0); //za exchange
+  const [transferAmount, setTransferAmount] = useState(0);
+  const [userMoney, setUserMoney] = useState(0);
 
   const today = new Date();
   const date =
@@ -26,14 +32,6 @@ const MainPage = () => {
     navigate("/");
   };
 
-  // useEffect(() => {
-  //   const getUser = async () => {
-  //     const resp = await httpClient.get("http://127.0.0.1:5000/@me");
-  //   };
-
-  //   getUser();
-  // }, []);
-
   useEffect(() => {
     const getUserMoney = async () => {
       const resp = await httpClient("http://127.0.0.1:5000/getMoney");
@@ -43,6 +41,26 @@ const MainPage = () => {
 
     getUserMoney();
   }, [userMoney]);
+
+  useEffect(() => {
+    const getUserCrypto = async () => {
+      const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
+      setUserCryptoList(resp.data);
+    };
+
+    getUserCrypto();
+  }, [amountToBuy]);
+
+  useEffect(() => {
+    const getUserTransactions = async () => {
+      const resp = await httpClient.get(
+        "http://127.0.0.1:5000/getTransactions"
+      );
+      setUserTransactions(resp.data);
+    };
+
+    getUserTransactions();
+  }, [transferAmount]);
 
   useEffect(() => {
     const getSymbol = async () => {
@@ -67,21 +85,16 @@ const MainPage = () => {
     getCurrencyAll();
   }, []);
 
-  useEffect(() => {
-    const getUserCrypto = async () => {
-      const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
-      setUserCryptoList(resp.data);
-    };
-
-    getUserCrypto();
-  }, [amountToBuy]);
-
-  const showUserCrypto = async () => {
+  const showUserCrypto = () => {
     setToShow("userCrypto");
   };
 
-  const showCurrencyAll = async () => {
+  const showCurrencyAll = () => {
     setToShow("all");
+  };
+
+  const showTransactions = () => {
+    setToShow("transactions");
   };
 
   return (
@@ -107,18 +120,27 @@ const MainPage = () => {
             currencyAll={currencyAll}
           />
         ) : null}
+        {toShow === "transactions" ? (
+          <TransactionList userTransactions={userTransactions} />
+        ) : null}
       </div>
       <div className="summary">
         <button className="btn btn--show" onClick={showCurrencyAll}>
           Show currency states
         </button>
-        <button className="btn btn--show">Show transactions</button>
+        <button className="btn btn--show" onClick={showTransactions}>
+          Show transactions
+        </button>
         <button className="btn btn--show" onClick={showUserCrypto}>
           Show crypto
         </button>
         <button className="btn btn--show">Show transaction requests</button>
       </div>
-      <Transfer currencySymbols={currencySymbols} />
+      <Transfer
+        currencySymbols={currencySymbols}
+        transferAmount={transferAmount}
+        setTransferAmount={setTransferAmount}
+      />
       <BankImport userMoney={userMoney} setUserMoney={setUserMoney} />
       <CurrencyExchange
         currencySymbolsUsd={currencySymbolsUsd}
