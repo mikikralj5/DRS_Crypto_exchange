@@ -144,6 +144,16 @@ def create_crypto_currency(name, amount, crypto_account):
     return
 
 
+@app.route("/gettransactionRequests")
+def get_transaction_requests():
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    transactions = Transaction.query.filter_by(recipient=user.email)
+    schema = TransactionSchema(many=True)# ako vracam vise
+    results = schema.dump(transactions)
+    return jsonify(results)
+
+
 @app.route("/showCrypto_all")
 def get_crypto_value():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
@@ -166,11 +176,11 @@ def get_crypto_value():
 @app.route("/showCryptoSymbols")
 def get_all_crypto_currencies():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
-    #parameters = {"start": 1, "limit": 5000}
+    parameters = {"sort": "cmc_rank"}
     headers = {"Accepts": "application/json", "X-CMC_PRO_API_KEY": "4ceb685b-2766-45cc-8127-147c64386639"}
     sess = requests.Session()
     sess.headers.update(headers)
-    response = sess.get(url)
+    response = sess.get(url, params=parameters)
     json_response = response.json()
     crypto_list = []
     for i in range(len(json_response["data"])):
