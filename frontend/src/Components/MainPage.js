@@ -17,6 +17,7 @@ const MainPage = () => {
   const [currencyAll, setCurrencyAll] = useState([]);
   const [userCryptoList, setUserCryptoList] = useState([]);
   const [userTransactions, setUserTransactions] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
 
   //dependencies
   const [amountToBuy, setAmountToBuy] = useState(0); //za exchange
@@ -61,6 +62,15 @@ const MainPage = () => {
 
     getUserTransactions();
   }, [transferAmount]);
+
+  useEffect(() => {
+    const getUserEmail = async () => {
+      const resp = await httpClient.get("http://127.0.0.1:5000/@me");
+      setUserEmail(resp.data);
+    };
+
+    getUserEmail();
+  }, [userTransactions]);
 
   useEffect(() => {
     const getSymbol = async () => {
@@ -121,7 +131,10 @@ const MainPage = () => {
           />
         ) : null}
         {toShow === "transactions" ? (
-          <TransactionList userTransactions={userTransactions} />
+          <TransactionList
+            userTransactions={userTransactions}
+            userEmail={userEmail}
+          />
         ) : null}
       </div>
       <div className="summary">

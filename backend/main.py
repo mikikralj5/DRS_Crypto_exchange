@@ -307,7 +307,7 @@ def create_transaction():
         generated_string = "" + user.email + recipient_email + str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
 
-        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user)
+        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user,state=TransactionState.DONE.value)
         db.session.add(transaction)
         db.session.commit()
         return Response(status=200)

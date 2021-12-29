@@ -6,15 +6,15 @@ const Transfer = ({ currencySymbols, transferAmount, setTransferAmount }) => {
   const [currencyTransfer, setCurrencyTrasfer] = useState("BTC");
 
   const transferCrypto = async () => {
-    // const resp = await httpClient.patch(
-    //   "http://127.0.0.1:5000/createTransaction",
-    //   {
-    //     recepient,
-    //     transferAmount,
-    //     currencyTransfer,
-    //   }
-    // );
-    //console.log(resp.status);
+    const resp = await httpClient.post(
+      "http://127.0.0.1:5000/createTransaction",
+      {
+        recepient,
+        transferAmount,
+        currencyTransfer,
+      }
+    );
+    console.log(resp.status);
     setTransferAmount(0);
     setCurrencyTrasfer("BTC");
     setRecepient("");
