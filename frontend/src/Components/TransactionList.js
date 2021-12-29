@@ -1,7 +1,7 @@
 import React from "react";
 import Transaction from "./Transaction";
 
-const TransactionList = ({ userTransactions, userEmail }) => {
+const TransactionList = ({ userTransactions, userEmail, turnOnModal }) => {
   return (
     <div>
       {userTransactions.map((transaction, index) => (
@@ -9,6 +9,7 @@ const TransactionList = ({ userTransactions, userEmail }) => {
           transaction={transaction}
           key={index}
           userEmail={userEmail}
+          turnOnModal={turnOnModal}
         />
       ))}
     </div>

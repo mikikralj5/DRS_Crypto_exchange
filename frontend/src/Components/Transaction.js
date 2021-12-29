@@ -1,35 +1,34 @@
 import React, { useState } from "react";
 
-const Transaction = ({ transaction, userEmail }) => {
-  // const [transactionColor, setTransactionColor] = useState("");
-  // const [transactionAmount, setTransactionAmount] = useState("");
-  // if (transaction.state === "REJECTED") {
-  //   setTransactionColor("withdrawal");
-  //   setTransactionAmount("REJECTED");
-  // } else if (transaction.state === "IN_PROGRESS") {
-  //   setTransactionColor("progress");
-  //   setTransactionAmount("MINING");
-  // } else {
-  //   setTransactionColor("deposit");
-  //   setTransactionAmount(transaction.amount);
-  // }
+const Transaction = ({ transaction, userEmail, turnOnModal }) => {
+  let transactionAmount;
+  let transactionColor;
+  if (transaction.state === "REJECTED") {
+    transactionColor = "withdrawal";
+    transactionAmount = "REJECTED";
+  } else if (transaction.state === "IN_PROGRESS") {
+    transactionColor = "progress";
+    transactionAmount = transaction.amount;
+  } else {
+    transactionColor = "deposit";
+    transactionAmount = transaction.amount;
+  }
+
+  const transactionDetails = () => {
+    console.log("clicked");
+  };
   return (
     <div>
-      <div className="movements__row">
-        {/* <div
-          className={`movements__type movements__type--${
-            transaction.state === "REJECTED" ? "withdrawal" : "deposit"
-          }`}
-        > */}
-        <div
-          className={`movements__type movements__type--${
-            transaction.state === "IN_PROGRESS" ? "progress" : "deposit"
-          }`}
-        >
+      <div
+        className="movements__row"
+        onClick={() => turnOnModal(transaction)}
+        style={{ cursor: "pointer" }}
+      >
+        <div className={`movements__type movements__type--${transactionColor}`}>
           {transaction.cryptocurrency}
         </div>
 
-        <div className="movements__value">{transaction.amount}</div>
+        <div className="movements__value">{transactionAmount}</div>
       </div>
     </div>
   );

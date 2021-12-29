@@ -8,7 +8,7 @@ import Transfer from "./Transfer";
 import UserCryptoList from "./UserCryptoList";
 import TransactionList from "./TransactionList";
 
-const MainPage = () => {
+const MainPage = ({ turnOnModal }) => {
   const navigate = useNavigate();
   const [toShow, setToShow] = useState("all");
   const [currencySymbols, setCurrencySymbols] = useState([]);
@@ -134,6 +134,7 @@ const MainPage = () => {
           <TransactionList
             userTransactions={userTransactions}
             userEmail={userEmail}
+            turnOnModal={turnOnModal}
           />
         ) : null}
       </div>
@@ -149,6 +150,7 @@ const MainPage = () => {
         </button>
         <button className="btn btn--show">Show transaction requests</button>
       </div>
+
       <Transfer
         currencySymbols={currencySymbols}
         transferAmount={transferAmount}

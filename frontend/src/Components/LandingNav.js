@@ -16,7 +16,6 @@ const LandingNav = () => {
         password,
       });
 
-      console.log(resp.data);
       navigate("/mainPage");
     } catch (error) {
       if (error.response.status === 401) {
