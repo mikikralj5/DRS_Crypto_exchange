@@ -8,7 +8,11 @@ const ModalWindow = ({ turnOff, modalTransaction }) => {
           &times;
         </button>
         <h1>Sender: {modalTransaction.sender}</h1>
-        <h1>Amount: {modalTransaction.amount}</h1>
+        <h1>Recipient: {modalTransaction.recipient}</h1>
+        <h1>State: {modalTransaction.state}</h1>
+        <h1>
+          Amount: {modalTransaction.amount} {modalTransaction.cryptocurrency}
+        </h1>
       </div>
       <div class="overlay hidden"></div>
     </div>
