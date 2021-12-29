@@ -312,12 +312,7 @@ def create_transaction():
         generated_string = "" + user.email + recipient_email + str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
 
-<<<<<<< Updated upstream
-
-        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, state=TransactionState.WAITING_FOR_USER.value, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user)
-=======
         transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user,state=TransactionState.REJECTED.value)
->>>>>>> Stashed changes
         db.session.add(transaction)
         db.session.commit()
         return Response(status=200)
