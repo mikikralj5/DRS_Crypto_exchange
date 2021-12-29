@@ -130,7 +130,7 @@ def user_exists(email):
         return True
 
 
-def update_crypto_currency(name, amount, crypto_currencies):
+def update_crypto_currency(name, amount, crypto_currencies): #izmeni metoduda bude clean
     crypto_currency = next(filter(lambda x: x.name == name, crypto_currencies), None)
     crypto_currency.amount += amount
     if crypto_currency.amount < 0:
@@ -264,9 +264,9 @@ def mining(transaction_id, crypto_name, amount):
     basedir, "CryptoDB.db"))
     local_session = sqlalchemy.orm.Session(bind=engine)
 
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    crypto_account = user.crypto_account
+    transaction = local_session.query(Transaction).get(transaction_id)
+    recipient = local_session.query(User).filter_by(email=transaction.recipient).first()
+    crypto_account = recipient.crypto_account
     crypto_currencies = crypto_account.crypto_currencies
     iterator = filter(lambda x: x.name == crypto_name, crypto_currencies)
     crypto_currencies = list(iterator)  # da bi vratio listu ovo ogre je iterator
@@ -275,7 +275,6 @@ def mining(transaction_id, crypto_name, amount):
     else:
         update_crypto_currency(crypto_name, amount, crypto_currencies)
 
-    transaction = local_session.query(Transaction).get(transaction_id)
     transaction.state = TransactionState.DONE.value
     local_session.commit()
     return Response(status=200)
