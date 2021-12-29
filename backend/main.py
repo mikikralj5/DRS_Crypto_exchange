@@ -133,6 +133,8 @@ def user_exists(email):
 def update_crypto_currency(name, amount, crypto_currencies):
     crypto_currency = next(filter(lambda x: x.name == name, crypto_currencies), None)
     crypto_currency.amount += amount
+    if crypto_currency.amount < 0:
+        return {"error": "You don't have enough cryptocurrency"}, 400
     db.session.commit()
     return
 
@@ -283,10 +285,14 @@ def mining(transaction_id, crypto_name, amount):
 def update_transaction_state():
     transaction_id = request.json["transaction_id"]
     state = request.json["state"]
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    crypto_account = user.crypto_account
     transaction = Transaction.query.get(transaction_id)
     if TransactionState[state].value == "IN_PROGRESS":
         transaction.state = TransactionState.IN_PROGRESS.value
         db.session.commit()
+        update_crypto_currency(transaction.cryptocurrency, -transaction.amount, crypto_account.crypto_currencies)
         _thread.start_new_thread(mining, (transaction_id, transaction.cryptocurrency, transaction.amount))
     else:
         transaction.state = TransactionState.REJECTED.value
@@ -297,9 +303,9 @@ def update_transaction_state():
 
 @app.route("/createTransaction", methods=["POST"])
 def create_transaction():
-    recipient_email = request.json["recepient"]
-    amount = int(request.json["transferAmount"])
-    cryptocurrency = request.json["currencyTransfer"]
+    recipient_email = request.json["recipient_email"]
+    amount = int(request.json["amount"])
+    cryptocurrency = request.json["cryptocurrency"]
     if user_exists(recipient_email) is True:
         user_id = session.get("user_id")
         user = User.query.get(user_id)
@@ -307,7 +313,8 @@ def create_transaction():
         generated_string = "" + user.email + recipient_email + str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
 
-        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user,state=TransactionState.DONE.value)
+
+        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, state=TransactionState.WAITING_FOR_USER.value, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user)
         db.session.add(transaction)
         db.session.commit()
         return Response(status=200)
