@@ -3,15 +3,29 @@ import React, { useState } from "react";
 const Transaction = ({ transaction, userEmail, turnOnModal }) => {
   let transactionAmount;
   let transactionColor;
+  let transactionState;
+
   if (transaction.state === "REJECTED") {
     transactionColor = "withdrawal";
     transactionAmount = "REJECTED";
   } else if (transaction.state === "IN_PROGRESS") {
     transactionColor = "progress";
-    transactionAmount = transaction.amount;
+    if (userEmail === transaction.sender) {
+      transactionAmount = "-" + transaction.amount;
+    } else {
+      transactionAmount = transaction.amount;
+    }
+
+    transactionState = "mining";
   } else {
+    if (userEmail === transaction.sender) {
+      transactionAmount = "-" + transaction.amount;
+    } else {
+      transactionAmount = transaction.amount;
+    }
     transactionColor = "deposit";
-    transactionAmount = transaction.amount;
+    //transactionAmount = transaction.amount;
+    transactionState = "done";
   }
 
   const transactionDetails = () => {
@@ -27,7 +41,7 @@ const Transaction = ({ transaction, userEmail, turnOnModal }) => {
         <div className={`movements__type movements__type--${transactionColor}`}>
           {transaction.cryptocurrency}
         </div>
-
+        <div className="movements__value">{transactionState}</div>
         <div className="movements__value">{transactionAmount}</div>
       </div>
     </div>

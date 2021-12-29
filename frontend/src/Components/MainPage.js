@@ -66,7 +66,7 @@ const MainPage = ({ turnOnModal }) => {
   useEffect(() => {
     const getUserEmail = async () => {
       const resp = await httpClient.get("http://127.0.0.1:5000/@me");
-      setUserEmail(resp.data);
+      setUserEmail(resp.data.email);
     };
 
     getUserEmail();

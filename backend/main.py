@@ -454,7 +454,7 @@ def get_current_user():
         return jsonify({"error" : "Unauthorized"}), 401
 
     user = User.query.filter_by(id=user_id).first()
-    return user_schema.jsonify(user.email)
+    return jsonify({"email" : user.email})
     
 
 @app.route("/updateUser", methods=["PUT"])#put ili patch

@@ -14,7 +14,7 @@ const ModalWindow = ({ turnOff, modalTransaction }) => {
           Amount: {modalTransaction.amount} {modalTransaction.cryptocurrency}
         </h1>
       </div>
-      <div class="overlay hidden"></div>
+      <div className="overlay hidden"></div>
     </div>
   );
 };
