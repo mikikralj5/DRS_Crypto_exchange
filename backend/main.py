@@ -145,16 +145,6 @@ def create_crypto_currency(name, amount, crypto_account):
     db.session.commit()
     return
 
-#
-# @app.route("/gettransactionRequests")
-# def get_transaction_requests():
-#     user_id = session.get("user_id")
-#     user = User.query.get(user_id)
-#     transactions = Transaction.query.filter_by(recipient=user.email)
-#     schema = TransactionSchema(many=True)# ako vracam vise
-#     results = schema.dump(transactions)
-#     return jsonify(results)
-
 
 @app.route("/showCrypto_all")
 def get_crypto_value():
@@ -353,22 +343,24 @@ def sort_function():
     return jsonify(results), 200
 
 
-@app.route("/getTransactions")
+@app.route("/getTransactions")#primljene i poslate njegove nema waiting for user
 def get_transactions():
     user_id = session.get("user_id")
     user = User.query.get(user_id)
-    all_transactions = user.transactions
-    iterator = filter(lambda x: x.state != TransactionState.WAITING_FOR_USER.value, all_transactions)
+    #all_transactions = user.transactions
+    all_transactions = Transaction.query.all()
+    iterator = filter(lambda x: x.state != TransactionState.WAITING_FOR_USER.value and (x.sender == user.email or x.recipient == user.email), all_transactions)
     all_transactions = list(iterator)  # da bi vratio listu ovo ogre je iterator
     schema = TransactionSchema(many=True)# ako vracam vise
     results = schema.dump(all_transactions)
     return jsonify(results)
 
-@app.route("/getTransactionRequests")
+
+@app.route("/getTransactionRequests")#saom primljene
 def get_transaction_requests():
     user_id = session.get("user_id")
     user = User.query.get(user_id)
-    all_transactions = user.transactions
+    all_transactions = Transaction.query.all()
     iterator = filter(lambda x: x.state == TransactionState.WAITING_FOR_USER.value and x.recipient == user.email, all_transactions)
     all_transactions = list(iterator)  
     schema = TransactionSchema(many=True)
