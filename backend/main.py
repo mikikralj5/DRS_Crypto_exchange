@@ -302,9 +302,9 @@ def update_transaction_state():
 
 @app.route("/createTransaction", methods=["POST"])
 def create_transaction():
-    recipient_email = request.json["recipient_email"]
-    amount = int(request.json["amount"])
-    cryptocurrency = request.json["cryptocurrency"]
+    recipient_email = request.json["recepient"]
+    amount = int(request.json["transferAmount"])
+    cryptocurrency = request.json["currencyTransfer"]
     if user_exists(recipient_email) is True:
         user_id = session.get("user_id")
         user = User.query.get(user_id)
@@ -312,7 +312,7 @@ def create_transaction():
         generated_string = "" + user.email + recipient_email + str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
 
-        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user,state=TransactionState.REJECTED.value)
+        transaction = Transaction(hashID=keccak.hexdigest(), sender=user.email, recipient=recipient_email, amount=amount, cryptocurrency=cryptocurrency, user_id=user_id, user=user,state=TransactionState.WAITING_FOR_USER.value)
         db.session.add(transaction)
         db.session.commit()
         return Response(status=200)
@@ -361,6 +361,17 @@ def get_transactions():
     iterator = filter(lambda x: x.state != TransactionState.WAITING_FOR_USER.value, all_transactions)
     all_transactions = list(iterator)  # da bi vratio listu ovo ogre je iterator
     schema = TransactionSchema(many=True)# ako vracam vise
+    results = schema.dump(all_transactions)
+    return jsonify(results)
+
+@app.route("/getTransactionRequests")
+def get_transaction_requests():
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    all_transactions = user.transactions
+    iterator = filter(lambda x: x.state == TransactionState.WAITING_FOR_USER.value and x.recipient == user.email, all_transactions)
+    all_transactions = list(iterator)  
+    schema = TransactionSchema(many=True)
     results = schema.dump(all_transactions)
     return jsonify(results)
 

@@ -18,6 +18,7 @@ const MainPage = ({ turnOnModal }) => {
   const [userCryptoList, setUserCryptoList] = useState([]);
   const [userTransactions, setUserTransactions] = useState([]);
   const [userEmail, setUserEmail] = useState("");
+  const [userTransactionReqeusts, setuserTransactionReqeusts] = useState([]);
 
   //dependencies
   const [amountToBuy, setAmountToBuy] = useState(0); //za exchange
@@ -62,6 +63,18 @@ const MainPage = ({ turnOnModal }) => {
 
     getUserTransactions();
   }, [transferAmount]);
+
+  useEffect(() => {
+    const getTransactionRequests = async () => {
+      const resp = await httpClient.get(
+        "http://127.0.0.1:5000/getTransactionRequests"
+      );
+      console.log(resp.data);
+      //setuserTransactionReqeusts(resp.data);
+    };
+
+    getTransactionRequests();
+  }, []);
 
   useEffect(() => {
     const getUserEmail = async () => {

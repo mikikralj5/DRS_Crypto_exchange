@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const Transaction = ({ transaction, userEmail, turnOnModal }) => {
   let transactionAmount;
@@ -28,9 +28,6 @@ const Transaction = ({ transaction, userEmail, turnOnModal }) => {
     transactionState = "done";
   }
 
-  const transactionDetails = () => {
-    console.log("clicked");
-  };
   return (
     <div>
       <div
