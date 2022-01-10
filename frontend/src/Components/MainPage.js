@@ -7,6 +7,7 @@ import CurrencyExchange from "./CurrencyExchange";
 import Transfer from "./Transfer";
 import UserCryptoList from "./UserCryptoList";
 import TransactionList from "./TransactionList";
+import TransactionRequestLits from "./TransactionRequestLits";
 
 const MainPage = ({ turnOnModal }) => {
   const navigate = useNavigate();
@@ -69,8 +70,8 @@ const MainPage = ({ turnOnModal }) => {
       const resp = await httpClient.get(
         "http://127.0.0.1:5000/getTransactionRequests"
       );
-      console.log(resp.data);
-      //setuserTransactionReqeusts(resp.data);
+
+      setuserTransactionReqeusts(resp.data);
     };
 
     getTransactionRequests();
@@ -120,6 +121,10 @@ const MainPage = ({ turnOnModal }) => {
     setToShow("transactions");
   };
 
+  const showTransactionRequests = () => {
+    setToShow("requests");
+  };
+
   return (
     <main className="app">
       <div className="balance">
@@ -150,6 +155,12 @@ const MainPage = ({ turnOnModal }) => {
             turnOnModal={turnOnModal}
           />
         ) : null}
+        {toShow == "requests" ? (
+          <TransactionRequestLits
+            userTransactionReqeusts={userTransactionReqeusts}
+            turnOnModal={turnOnModal}
+          />
+        ) : null}
       </div>
       <div className="summary">
         <button className="btn btn--show" onClick={showCurrencyAll}>
@@ -161,7 +172,9 @@ const MainPage = ({ turnOnModal }) => {
         <button className="btn btn--show" onClick={showUserCrypto}>
           Show crypto
         </button>
-        <button className="btn btn--show">Show transaction requests</button>
+        <button className="btn btn--show" onClick={showTransactionRequests}>
+          Show transaction requests
+        </button>
       </div>
 
       <Transfer

@@ -248,7 +248,7 @@ def exchange():
 
 
 def mining(transaction_id, crypto_name, amount):
-    sleep(5*60)
+    sleep(5*5)
     basedir = os.path.abspath(os.path.dirname(__file__))
     engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(
     basedir, "CryptoDB.db"))

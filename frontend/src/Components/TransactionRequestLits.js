@@ -1,10 +1,11 @@
 import React from "react";
+import TransactionRequest from "./TransactionRequest";
 
-const TransactionRequestLits = ({ transactionRequests, turnOnModal }) => {
+const TransactionRequestLits = ({ userTransactionReqeusts, turnOnModal }) => {
   return (
     <div>
-      {userTransactions.map((transactionRequest, index) => (
-        <Transaction
+      {userTransactionReqeusts.map((transactionRequest, index) => (
+        <TransactionRequest
           transactionRequest={transactionRequest}
           key={index}
           turnOnModal={turnOnModal}

@@ -238,6 +238,10 @@ nav {
   background-image: linear-gradient(to top left, #e2e52a, #ffeb36);
 }
 
+.movements__type--pending {
+  background-image: linear-gradient(to top left, #5c5c5c, #6e6e62);
+}
+
 .movements__value {
   font-size: 1.7rem;
   margin-left: auto;

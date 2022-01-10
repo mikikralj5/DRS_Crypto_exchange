@@ -13,7 +13,7 @@ const Transaction = ({ transaction, userEmail, turnOnModal }) => {
     if (userEmail === transaction.sender) {
       transactionAmount = "-" + transaction.amount;
     } else {
-      transactionAmount = transaction.amount;
+      transactionAmount = "+" + transaction.amount;
     }
 
     transactionState = "mining";
@@ -21,7 +21,7 @@ const Transaction = ({ transaction, userEmail, turnOnModal }) => {
     if (userEmail === transaction.sender) {
       transactionAmount = "-" + transaction.amount;
     } else {
-      transactionAmount = transaction.amount;
+      transactionAmount = "+" + transaction.amount;
     }
     transactionColor = "deposit";
     //transactionAmount = transaction.amount;
