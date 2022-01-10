@@ -125,6 +125,15 @@ const MainPage = ({ turnOnModal }) => {
     setToShow("requests");
   };
 
+  const onRequestResolve = (clickedReq) => {
+    console.log(clickedReq);
+    const newReq = userTransactionReqeusts.filter((req) => {
+      return req.hashID !== clickedReq.hashID;
+    });
+
+    setuserTransactionReqeusts(newReq);
+  };
+
   return (
     <main className="app">
       <div className="balance">
@@ -155,10 +164,11 @@ const MainPage = ({ turnOnModal }) => {
             turnOnModal={turnOnModal}
           />
         ) : null}
-        {toShow == "requests" ? (
+        {toShow === "requests" ? (
           <TransactionRequestLits
             userTransactionReqeusts={userTransactionReqeusts}
             turnOnModal={turnOnModal}
+            onRequestResolve={onRequestResolve}
           />
         ) : null}
       </div>
