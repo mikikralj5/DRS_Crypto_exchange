@@ -247,7 +247,7 @@ def exchange():
     return Response(status=200)
 
 
-def mining(transaction_id, crypto_name, amount):
+def mining(user_id, transaction_id, crypto_name, amount):
     sleep(5*5)
     basedir = os.path.abspath(os.path.dirname(__file__))
     engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(
@@ -255,8 +255,8 @@ def mining(transaction_id, crypto_name, amount):
     local_session = sqlalchemy.orm.Session(bind=engine)
 
     transaction = local_session.query(Transaction).get(transaction_id)
-    recipient = local_session.query(User).filter_by(email=transaction.recipient).first()
-    crypto_account = recipient.crypto_account
+    user = local_session.query(User).filter_by(email=transaction.recipient).first()
+    crypto_account = user.crypto_account
     crypto_currencies = crypto_account.crypto_currencies
     iterator = filter(lambda x: x.name == crypto_name, crypto_currencies)
     crypto_currencies = list(iterator)  # da bi vratio listu ovo ogre je iterator
@@ -275,14 +275,15 @@ def update_transaction_state():
     transaction_id = request.json["transaction_id"]
     state = request.json["state"]
     user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    crypto_account = user.crypto_account
     transaction = Transaction.query.get(transaction_id)
+    recipient = User.query.filter_by(email=transaction.sender).first()
+    crypto_account = recipient.crypto_account
+
     if TransactionState[state].value == "IN_PROGRESS":
         transaction.state = TransactionState.IN_PROGRESS.value
         db.session.commit()
         update_crypto_currency(transaction.cryptocurrency, -transaction.amount, crypto_account.crypto_currencies)
-        _thread.start_new_thread(mining, (transaction_id, transaction.cryptocurrency, transaction.amount))
+        _thread.start_new_thread(mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount))
     else:
         transaction.state = TransactionState.REJECTED.value
         db.session.commit()
@@ -310,7 +311,7 @@ def create_transaction():
         return "User with that email doesn't exist", 400
 
 
-@app.route("/filterTransaction")
+@app.route("/filterTransaction", methods=["POST"])
 def filter_transaction():
     filter_by = request.json["filter_by"]
     value = request.json["value"]
@@ -418,12 +419,30 @@ def register_user():
     hashed_password = bcrypt.generate_password_hash(password)
     user = User(name, lname, address, hashed_password, email, phone, country, city)
 
-    send_mail(user)
+    #send_mail(user) sbes
 
     db.session.add(user)
     db.session.commit()
 
     return Response(status=200)
+
+
+@app.route("/verifyUser", methods=["PATCH"])
+def verify_user():
+    number = request.json["number"]
+    name = request.json["name"]
+    exp_date = request.json["exp_date"]
+    security_code = request.json["security_code"]
+
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+
+    if number == "4242424242424242" and user.first_name == name and exp_date == "02/23" and security_code == "123":
+        user.verified = "true"
+        db.session.commit()
+        return jsonify({"verified": "true"}), 200
+
+    return jsonify({"verified": "false"}), 401
 
 
 @app.route("/login", methods=["POST"])
@@ -440,13 +459,17 @@ def login_user():
 
     session["user_id"] = user.id #on je pravio neki hex za id
 
-    return user_schema.jsonify(user)
+    if user.verified == "false":
+        return jsonify({"error": "need verification"}), 401
+
+    return Response(status=200)
 
 
-@app.route("/logout", methods = ["POST"])
+@app.route("/logout", methods=["POST"])
 def logout_user():
+
     session.pop("user_id")
-    return "200"
+    return Response(status=200)
 
 
 @app.route("/@me")
@@ -474,7 +497,6 @@ def update_user():
     user.country = request.json["country"]
     user.city = request.json["city"]
 
-
     email_adress_exists = User.query.filter_by(email=user.email).count() #true ako postoji taj User
     if email_adress_exists > 1:
         return jsonify({"error": "User with that email already exists"}), 409
@@ -483,7 +505,6 @@ def update_user():
 
     db.session.commit()
     return redirect("/@me")
-
 
 
 if __name__ == "__main__":

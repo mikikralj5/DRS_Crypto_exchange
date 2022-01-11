@@ -16,7 +16,7 @@ class User(db.Model):
     phone = db.Column(db.String(50))
     country = db.Column(db.String(50))
     city = db.Column(db.String(50))
-    otp = db.Column(db.String(7))
+    verified = db.Column(db.String(6))
     crypto_account = db.relationship(
         "CryptoAccount", backref="user", uselist=False
     )  # one to one
