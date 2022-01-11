@@ -261,9 +261,15 @@ def mining(user_id, transaction_id, crypto_name, amount):
     iterator = filter(lambda x: x.name == crypto_name, crypto_currencies)
     crypto_currencies = list(iterator)  # da bi vratio listu ovo ogre je iterator
     if crypto_currencies == []:
-        create_crypto_currency(crypto_name, amount, crypto_account)
+        crypto_currency = CryptoCurrency(amount=amount, name=crypto_name, account_id=crypto_account.id)
+        local_session.add(crypto_currency)
+        local_session.commit()
     else:
-        update_crypto_currency(crypto_name, amount, crypto_currencies)
+        crypto_currency = next(filter(lambda x: x.name == crypto_name, crypto_currencies), None)
+        crypto_currency.amount += amount
+        if crypto_currency.amount < 0:
+            return {"error": "You don't have enough cryptocurrency"}, 400
+        local_session.commit()
 
     transaction.state = TransactionState.DONE.value
     local_session.commit()
