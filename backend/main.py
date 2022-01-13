@@ -379,7 +379,22 @@ def sort_crypto():
     results = schema.dump(all_transactions)
     return jsonify(results), 200
 
+
+@app.route("/filterCrypto", methods=["POST"])
+def filter_crypto():
+    filter_by = request.json["filter_by"]
+    value = request.json["value"]
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    all_transactions = user.transactions
+
+    all_transactions = filter(lambda x: getattr(x, filter_by) == value, all_transactions)
+
+    schema = TransactionSchema(many=True)  # ako vracam vise
+    results = schema.dump(all_transactions)
+    return jsonify(results), 200
     
+
 @app.route("/getTransactionRequests")#saom primljene
 def get_transaction_requests():
     user_id = session.get("user_id")
