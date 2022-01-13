@@ -29,6 +29,7 @@ const LandingNav = () => {
       password,
     });
 
+    console.log(resp.data);
     if (resp.data.error === "Unauthorized") {
       setErr(true);
     } else if (resp.data.error === "need verification") {
