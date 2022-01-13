@@ -437,8 +437,8 @@ def register_user():
 def verify_user():
     number = request.json["number"]
     name = request.json["name"]
-    exp_date = request.json["exp_date"]
-    security_code = request.json["security_code"]
+    exp_date = request.json["expDate"]
+    security_code = request.json["securityCode"]
 
     user_id = session.get("user_id")
     user = User.query.get(user_id)
@@ -448,7 +448,7 @@ def verify_user():
         db.session.commit()
         return jsonify({"verified": "true"}), 200
 
-    return jsonify({"verified": "false"}), 401
+    return jsonify({"verified": "false"})
 
 
 @app.route("/login", methods=["POST"])
@@ -458,15 +458,15 @@ def login_user():
 
     user = User.query.filter_by(email=email).first() 
     if user is None:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"error": "Unauthorized"})
 
     if not bcrypt.check_password_hash(user.password, password):
-         return jsonify({"error": "Unauthorized"}), 401
+         return jsonify({"error": "Unauthorized"})
 
     session["user_id"] = user.id #on je pravio neki hex za id
 
     if user.verified == "false":
-        return jsonify({"error": "need verification"}), 401
+        return jsonify({"error": "need verification"})
 
     return Response(status=200)
 

@@ -3,6 +3,7 @@ import RegistrationForm from "./Components/RegistrationForm";
 import MainPage from "./Components/MainPage";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ModalWindow from "./Components/ModalWindow";
+import Verification from "./Components/Verification";
 import { useState } from "react";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             element={<MainPage turnOnModal={turnOnModal} />}
           />
           <Route path="/register" element={<RegistrationForm />} />
+          <Route path="/verification" element={<Verification />} />
         </Routes>
       </div>
     </Router>
