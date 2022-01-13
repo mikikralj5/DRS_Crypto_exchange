@@ -362,7 +362,24 @@ def get_transactions():
     results = schema.dump(all_transactions)
     return jsonify(results)
 
+@app.route("/sortCrypto")
+def sort_crypto():
+    sort_by = request.json["sort_by"]
+    sort_type = request.json["sort_type"]
 
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+    all_transactions = user.transactions
+    if sort_type == "Asc":
+        all_transactions.sort(key=lambda x: getattr(x, sort_by))
+    else:
+        all_transactions.sort(key=lambda x: getattr(x, sort_by), reverse=True)
+
+    schema = TransactionSchema(many=True)  # ako vracam vise
+    results = schema.dump(all_transactions)
+    return jsonify(results), 200
+
+    
 @app.route("/getTransactionRequests")#saom primljene
 def get_transaction_requests():
     user_id = session.get("user_id")
