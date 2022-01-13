@@ -174,16 +174,16 @@ const MainPage = ({ turnOnModal }) => {
       </div>
       <div className="summary">
         <button className="btn btn--show" onClick={showCurrencyAll}>
-          Show currency states
+          All currency
         </button>
         <button className="btn btn--show" onClick={showTransactions}>
-          Show transactions
+          My transactions
         </button>
         <button className="btn btn--show" onClick={showUserCrypto}>
-          Show crypto
+          My crypto
         </button>
         <button className="btn btn--show" onClick={showTransactionRequests}>
-          Show transaction requests
+          My transaction requests
         </button>
       </div>
 
