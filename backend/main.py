@@ -123,7 +123,7 @@ def send_mail(user):
 
 
 def user_exists(email):
-    user_exist = User.query.filter_by(email=email).first() is None
+    user_exist = User.query.filter_by(email=email).first() 
     if user_exist is None:
         return False
     else:
@@ -212,7 +212,7 @@ def exchange():
 
     if sell == "USD":
         if sum_to_pay > crypto_account.amount:
-            return {"error": "you don't have enough money"}, 400
+            return {"error": "You don't have enough money"}
         crypto_account.amount -= sum_to_pay
         crypto_currencies = crypto_account.crypto_currencies
         iterator = filter(lambda x: x.name == buy, crypto_currencies)
@@ -225,7 +225,7 @@ def exchange():
         crypto_currencies = crypto_account.crypto_currencies
         crypto_currency = next(filter(lambda x: x.name == sell, crypto_currencies), None)
         if sum_to_pay > crypto_currency.amount:
-            return {"error": "you don't have enough crypto currency"}, 400
+            return {"error": "You don't have enough crypto currency"}
         crypto_currency.amount -= sum_to_pay
         crypto_account.amount += amount
         db.session.commit()
@@ -314,7 +314,7 @@ def create_transaction():
         db.session.commit()
         return Response(status=200)
     else:
-        return "User with that email doesn't exist", 400
+        return {"error" : "User with that email doesn't exist"}
 
 
 @app.route("/filterTransaction", methods=["POST"])

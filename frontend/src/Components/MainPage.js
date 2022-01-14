@@ -9,7 +9,7 @@ import UserCryptoList from "./UserCryptoList";
 import TransactionList from "./TransactionList";
 import TransactionRequestLits from "./TransactionRequestLits";
 
-const MainPage = ({ turnOnModal }) => {
+const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   const navigate = useNavigate();
   const [toShow, setToShow] = useState("all");
   const [currencySymbols, setCurrencySymbols] = useState([]);
@@ -191,12 +191,14 @@ const MainPage = ({ turnOnModal }) => {
         currencySymbols={currencySymbols}
         transferAmount={transferAmount}
         setTransferAmount={setTransferAmount}
+        turnOnErroModal={turnOnErroModal}
       />
       <BankImport userMoney={userMoney} setUserMoney={setUserMoney} />
       <CurrencyExchange
         currencySymbolsUsd={currencySymbolsUsd}
         amountToBuy={amountToBuy}
         setAmountToBuy={setAmountToBuy}
+        turnOnErroModal={turnOnErroModal}
       />
     </main>
   );

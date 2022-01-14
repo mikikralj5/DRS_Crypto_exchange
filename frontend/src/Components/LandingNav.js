@@ -10,20 +10,6 @@ const LandingNav = () => {
   const navigate = useNavigate();
 
   const logInUser = async () => {
-    // try {
-    //   const resp = await httpClient.post("http://127.0.0.1:5000/login", {
-    //     email,
-    //     password,
-    //   });
-
-    //   console.log(resp.data.ok);
-    //   navigate("/mainPage");
-    // } catch (error) {
-    //   if (error.response.status === 401) {
-    //     setErr(true);
-    //   }
-    // }
-
     const resp = await httpClient.post("http://127.0.0.1:5000/login", {
       email,
       password,
