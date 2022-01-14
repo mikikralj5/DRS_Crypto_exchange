@@ -35,6 +35,10 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     navigate("/");
   };
 
+  const updateTransactions = (newTransaction) => {
+    setUserTransactions([...userTransactions, newTransaction]);
+  };
+
   useEffect(() => {
     const getUserMoney = async () => {
       const resp = await httpClient("http://127.0.0.1:5000/getMoney");
@@ -43,7 +47,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     };
 
     getUserMoney();
-  }, [userMoney]);
+  }, [userMoney, amountToBuy]);
 
   useEffect(() => {
     const getUserCrypto = async () => {
@@ -169,6 +173,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
             userTransactionReqeusts={userTransactionReqeusts}
             turnOnModal={turnOnModal}
             onRequestResolve={onRequestResolve}
+            updateTransactions={updateTransactions}
           />
         ) : null}
       </div>
