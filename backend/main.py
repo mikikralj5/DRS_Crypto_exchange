@@ -9,6 +9,7 @@ from werkzeug.utils import redirect
 import random
 import _thread
 from random import randint
+from datetime import datetime, timedelta
 import requests
 import string
 import sqlite3
@@ -22,7 +23,7 @@ from config import os
 
 from model.user import User, UserSchema
 from model.transaction import Transaction, TransactionSchema
-from model.payment_card import PaymentCard, PaymentCardSchema
+from model.payment_card import PaymentCard
 from model.crypto_currency import CryptoCurrency, CryptoCurrencySchema
 from model.crypto_account import CryptoAccount, CryptoAccountSchema
 
@@ -65,12 +66,28 @@ def create():
     return "All tables created"
 
 
-@app.route("/createCrypto_Account", methods=["POST"])
-def create_crypto_account():
-    amount = request.json["amount"]
-    user_id = request.json["user_id"]
-    user = User.query.get(user_id)
-    crypto_account = CryptoAccount(amount=amount, crypto_currencies=[], user_id=user_id, user=user)
+def gen_datetime():
+    # generate a datetime in format yyyy-mm-dd hh:mm:ss.000000
+    min_year = 2023
+    max_year = 2026
+    start = datetime(min_year, 1, 1, 00, 00, 00)
+    years = max_year - min_year + 1
+    end = start + timedelta(days=365 * years)
+    return start + (end - start) * random.random()
+
+
+def create_payment_account(user):
+    card_number = str(random.randint(1000, 9999))
+    cvv = str(random.randint(100, 999))
+    expiration_date = gen_datetime()
+    money_amount = random.randint(1000, 3000)
+    payment_card = PaymentCard(card_number=card_number,cvv = cvv , expiration_date=expiration_date, user_name=user.first_name, money_amount=money_amount, user=user)
+    db.session.add(payment_card)
+    db.session.commit()
+
+
+def create_crypto_account(user):
+    crypto_account = CryptoAccount(amount=0, crypto_currencies=[], user_id=user.id, user=user)
     db.session.add(crypto_account)
     db.session.commit()
     return "crypto_account created", 200
@@ -96,6 +113,8 @@ def deposit():
     payment_card = user.payment_card
     crypto_account = user.crypto_account
     payment_card.money_amount -= int(amount)
+    if payment_card.money_amount < 0:
+        return jsonify({"error": "You don't have enough money to transfer"}), 400
     crypto_account.amount += int(amount)
     db.session.commit()
 
@@ -422,7 +441,7 @@ def get_money():
     user_id = session.get("user_id")
     crypto_account = CryptoAccount.query.filter_by(user_id=user_id).first()
     
-    return jsonify({"value" : crypto_account.amount}), 200
+    return jsonify({"value": crypto_account.amount}), 200
 
 
 @app.route("/validateOTP", methods=["PATCH"])
@@ -457,10 +476,14 @@ def register_user():
     hashed_password = bcrypt.generate_password_hash(password)
     user = User(name, lname, address, hashed_password, email, phone, country, city)
 
-    #send_mail(user) sbes
+
+    #send_mail(user)
 
     db.session.add(user)
     db.session.commit()
+
+    create_payment_account(user)
+    create_crypto_account(user)
 
     return Response(status=200)
 
