@@ -12,3 +12,4 @@ flask-mail
 pysha3
 requests
 psycopg2
+gunicorn

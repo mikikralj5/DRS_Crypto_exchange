@@ -1,6 +1,6 @@
 export default class APIService {
   static async RegisterNewUser(body) {
-    const resp = await fetch("http://127.0.0.1:5000/registerUser", {
+    const resp = await fetch("http://localhost/registerUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -9,6 +9,7 @@ export default class APIService {
     });
 
     const data = await resp.json();
+    console.log(data);
 
     return data;
   }

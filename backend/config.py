@@ -16,7 +16,8 @@ class ApplicationConfig:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:1234@localhost/cryptoDB"
+    # SQLALCHEMY_DATABASE_URI = "postgresql://postgres:1234@localhost/CryptoDB"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://postgres:{os.environ['POSTGRES_PASSWORD']}@postgres:5432/{os.environ['POSTGRES_DB']}"
 
     SESSION_COOKIE_SECURE = True
     SESSION_TYPE = "redis"

@@ -1,3 +1,4 @@
+from email.policy import default
 from .crypto_account import CryptoAccountSchema
 from .payment_card import PaymentCardSchema
 from .transaction import TransactionSchema
@@ -8,15 +9,15 @@ from marshmallow import Schema, fields
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(32))
-    last_name = db.Column(db.String(32))
-    address = db.Column(db.String(50))
-    password = db.Column(db.String(50))
-    email = db.Column(db.String(50))
-    phone = db.Column(db.String(50))
-    country = db.Column(db.String(50))
-    city = db.Column(db.String(50))
-    verified = db.Column(db.String(6))
+    first_name = db.Column(db.String(320))
+    last_name = db.Column(db.String(320))
+    address = db.Column(db.String(500))
+    password = db.Column(db.String(500))
+    email = db.Column(db.String(500))
+    phone = db.Column(db.String(500))
+    country = db.Column(db.String(500))
+    city = db.Column(db.String(500))
+    verified = db.Column(db.String(20), default="false")
     crypto_account = db.relationship(
         "CryptoAccount", backref="user", uselist=False
     )  # one to one
@@ -46,7 +47,7 @@ class UserSchema(ma.Schema):
     phone = fields.Str()
     country = fields.Str()
     city = fields.Str()
-    otp = fields.Str()
+    verified = fields.Str()
     crypto_account = fields.Nested(CryptoAccountSchema)
     payment_card = fields.Nested(PaymentCardSchema)
     transactions = fields.List(fields.Nested(TransactionSchema))
