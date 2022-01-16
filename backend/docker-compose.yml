@@ -24,3 +24,10 @@ services:
         volumes:
             - .postgres-data:/var/lib/postgresql/data
         container_name: flask_postgres
+
+    redis:
+        image: redis
+        volumes:
+             - ./data:/data
+        ports:
+             - 6379:6379
