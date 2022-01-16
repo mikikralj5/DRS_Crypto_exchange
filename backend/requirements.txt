@@ -13,3 +13,5 @@ pysha3
 requests
 psycopg2
 gunicorn
+flask-mysql
+mysql-connector-python

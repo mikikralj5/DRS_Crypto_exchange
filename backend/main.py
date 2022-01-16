@@ -26,12 +26,10 @@ from model.transaction import Transaction, TransactionSchema
 from model.payment_card import PaymentCard
 from model.crypto_currency import CryptoCurrency, CryptoCurrencySchema
 from model.crypto_account import CryptoAccount, CryptoAccountSchema
-import time
 
 
-from config import db, ma, ApplicationConfig, SQLAlchemy
+from config import db, ma, ApplicationConfig, SQLAlchemy, mysql
 
-time.sleep(5)
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -53,8 +51,10 @@ bcrypt = Bcrypt(app)
 mail = Mail(app)
 # enabeld server side seesion sve je na serveru sem session id
 server_session = Session(app)
+mysql.init_app(app)
 db.init_app(app)
 ma.init_app(app)
+mysql.init_app(app)
 
 user_schema = UserSchema()
 
@@ -67,6 +67,7 @@ def index():
 @app.route("/create")
 def create():
     db.create_all()
+    db.session.commit()
     return "All tables created"
 
 
@@ -556,8 +557,8 @@ def login_user():
 
     session["user_id"] = user.id  # on je pravio neki hex za id
 
-    if user.verified == "false":
-        return jsonify({"error": "need verification"})
+    # if user.verified == "false":
+    #     return jsonify({"error": "need verification"})
 
     return Response(status=200)
 
@@ -606,4 +607,4 @@ def update_user():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True)
