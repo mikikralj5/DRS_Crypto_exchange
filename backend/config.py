@@ -18,16 +18,11 @@ class ApplicationConfig:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
-    # SQLALCHEMY_DATABASE_URI = "postgresql://postgres:1234@localhost/CryptoDB"
+    #SQLALCHEMY_DATABASE_URI = "postgresql://postgres:1234@localhost/CryptoDB"
     #SQLALCHEMY_DATABASE_URI = f"postgresql://postgres:{os.environ['POSTGRES_PASSWORD']}@postgres:5432/{os.environ['POSTGRES_DB']}"
-    # MYSQL_DATABASE_USER = 'root'
-    # MYSQL_DATABASE_PASSWORD = 'flasktest2021'
-    # MYSQL_DATABASE_DB = 'flasktest'
-    # MYSQL_DATABASE_HOST = '0.0.0.0'
 
-    #SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:flasktest2021@0.0.0.0/flasktest'
     SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:1234@db/mysql_db'
-
+    #ISOLATION_LEVEL = "READ UNCOMMITTED"
     SESSION_COOKIE_SECURE = True
     SESSION_TYPE = "redis"
     SESSION_PERMANENT = False

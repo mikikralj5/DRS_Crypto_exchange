@@ -7,10 +7,5 @@ export default class APIService {
       },
       body: JSON.stringify(body),
     });
-
-    const data = await resp.json();
-    console.log(data);
-
-    return data;
   }
 }

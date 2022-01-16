@@ -29,6 +29,7 @@ from model.crypto_account import CryptoAccount, CryptoAccountSchema
 
 
 from config import db, ma, ApplicationConfig, SQLAlchemy, mysql
+import time
 
 
 app = Flask(__name__)
@@ -557,8 +558,8 @@ def login_user():
 
     session["user_id"] = user.id  # on je pravio neki hex za id
 
-    # if user.verified == "false":
-    #     return jsonify({"error": "need verification"})
+    if user.verified == "false":
+        return jsonify({"error": "need verification"})
 
     return Response(status=200)
 
