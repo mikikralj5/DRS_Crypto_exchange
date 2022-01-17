@@ -29,7 +29,6 @@ from model.crypto_account import CryptoAccount, CryptoAccountSchema
 
 
 from config import db, ma, ApplicationConfig, SQLAlchemy, mysql
-import time
 
 
 app = Flask(__name__)
@@ -55,7 +54,7 @@ server_session = Session(app)
 mysql.init_app(app)
 db.init_app(app)
 ma.init_app(app)
-mysql.init_app(app)
+# mysql.init_app(app)
 
 user_schema = UserSchema()
 
