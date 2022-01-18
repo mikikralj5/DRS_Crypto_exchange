@@ -18,24 +18,24 @@ class ApplicationConfig:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
-         basedir, "CryptoDB.db"
-    )
+    # SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
+    #     basedir, "CryptoDB.db"
+    # )
     #SQLALCHEMY_DATABASE_URI = "postgresql://postgres:1234@localhost/CryptoDB"
     #SQLALCHEMY_DATABASE_URI = f"postgresql://postgres:{os.environ['POSTGRES_PASSWORD']}@postgres:5432/{os.environ['POSTGRES_DB']}"
 
-    #SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:1234@db/mysql_db'
-    #ISOLATION_LEVEL = "READ UNCOMMITTED"
-    SESSION_COOKIE_NAME = "user_id"
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:1234@db/mysql_db'
+    ISOLATION_LEVEL = "READ UNCOMMITTED"
     SESSION_COOKIE_SECURE = True
-    SESSION_TYPE = ""
+    SESSION_TYPE = "sqlalchemy"
     SESSION_PERMANENT = False
     SESSION_USE_SIGNER = True
-    #SESSION_REDIS = redis.Redis("redis")
-    SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")
+    SESSION_SQLALCHEMY = db
+    #SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")
     #SESSION_REDIS = redis.from_url("redis://redis:6379/0")
+    #SESSION_REDIS = redis.from_url("redis://localhost:6379")
+    #SESSION_REDIS = redis.from_url("redis://redis:6379")
     SESSION_COOKIE_SECURE = True
-
 
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465

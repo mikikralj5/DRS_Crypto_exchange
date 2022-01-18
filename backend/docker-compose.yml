@@ -32,10 +32,12 @@ services:
 
     
 
-    redis:
-        image: redis
-        restart: always
-        volumes:
-             - ./data:/data
-        ports:
-             - 6379:6379
+    # redis:
+    #     image: redis:alpine
+    #     restart: always
+    #     volumes:
+    #          - ./data:/data
+    #     ports:
+    #          - 6379:6379
+             
+    #     container_name: flask_redis

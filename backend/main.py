@@ -62,6 +62,7 @@ user_schema = UserSchema()
 
 @app.route("/", methods=["GET"])
 def index():
+
     return jsonify({"hello": "world"})
 
 
@@ -287,6 +288,7 @@ def exchange():
 
     return Response(status=200)
 
+
 def announce(q1, q2):
     q1.get()
     q2.put("done")
@@ -342,10 +344,11 @@ async def update_transaction_state():
         db.session.commit()
         update_crypto_currency(transaction.cryptocurrency, -
                                transaction.amount, crypto_account.crypto_currencies)
-        #_thread.start_new_thread(
+        # _thread.start_new_thread(
         #   mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount, q1))
         _thread.start_new_thread(announce, (q1, q2))
-        p = Process(target=mining, args=(user_id, transaction_id, transaction.cryptocurrency, transaction.amount, q1))
+        p = Process(target=mining, args=(user_id, transaction_id,
+                    transaction.cryptocurrency, transaction.amount, q1))
         p.start()
         q2.get()
     else:
