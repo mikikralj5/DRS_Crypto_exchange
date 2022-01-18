@@ -5,7 +5,7 @@ const TransactionRequestLits = ({
   userTransactionReqeusts,
   turnOnModal,
   onRequestResolve,
-  updateTransactions,
+  addTransactions,
 }) => {
   return (
     <div>
@@ -15,7 +15,7 @@ const TransactionRequestLits = ({
           key={index}
           turnOnModal={turnOnModal}
           onRequestResolve={onRequestResolve}
-          updateTransactions={updateTransactions}
+          addTransactions={addTransactions}
         />
       ))}
     </div>

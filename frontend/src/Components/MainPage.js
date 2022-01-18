@@ -35,8 +35,12 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     navigate("/");
   };
 
-  const updateTransactions = (newTransaction) => {
+  const addTransactions = (newTransaction) => {
     setUserTransactions([...userTransactions, newTransaction]);
+  };
+
+  const updateTransactions = (transactions) => {
+    setUserTransactions(transactions);
   };
 
   useEffect(() => {
@@ -130,7 +134,6 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
   };
 
   const onRequestResolve = (clickedReq) => {
-    console.log(clickedReq);
     const newReq = userTransactionReqeusts.filter((req) => {
       return req.hashID !== clickedReq.hashID;
     });
@@ -166,6 +169,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
             userTransactions={userTransactions}
             userEmail={userEmail}
             turnOnModal={turnOnModal}
+            updateTransactions={updateTransactions}
           />
         ) : null}
         {toShow === "requests" ? (
@@ -173,7 +177,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
             userTransactionReqeusts={userTransactionReqeusts}
             turnOnModal={turnOnModal}
             onRequestResolve={onRequestResolve}
-            updateTransactions={updateTransactions}
+            addTransactions={addTransactions}
           />
         ) : null}
       </div>

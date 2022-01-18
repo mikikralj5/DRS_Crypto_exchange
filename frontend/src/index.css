@@ -219,6 +219,16 @@ nav {
   margin-right: 2rem;
 }
 
+.movements__sort {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: rgb(3, 3, 3);
+  padding: 0.1rem 1rem;
+
+  margin-right: 2rem;
+}
+
 .movements__date {
   font-size: 1.1rem;
   text-transform: uppercase;
@@ -240,6 +250,12 @@ nav {
 
 .movements__type--pending {
   background-image: linear-gradient(to top left, #5c5c5c, #6e6e62);
+}
+
+.movements__value__sort {
+  font-size: 2rem;
+  margin-left: auto;
+  cursor: pointer;
 }
 
 .movements__value {
