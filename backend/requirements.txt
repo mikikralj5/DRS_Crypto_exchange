@@ -12,6 +12,7 @@ flask-mail
 pysha3
 requests
 psycopg2
+flask[async]
 gunicorn
 flask-mysql
 mysql-connector-python

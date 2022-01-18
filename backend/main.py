@@ -14,6 +14,7 @@ import requests
 import string
 import sqlite3
 from time import sleep
+from multiprocessing import Process, Queue
 import json
 from sha3 import keccak_256
 from model.transaction_state import TransactionState
@@ -286,8 +287,12 @@ def exchange():
 
     return Response(status=200)
 
+def announce(q1, q2):
+    q1.get()
+    q2.put("done")
 
-def mining(user_id, transaction_id, crypto_name, amount):
+
+def mining(user_id, transaction_id, crypto_name, amount, q1):
     sleep(5*6)
     basedir = os.path.abspath(os.path.dirname(__file__))
     engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(
@@ -317,11 +322,14 @@ def mining(user_id, transaction_id, crypto_name, amount):
 
     transaction.state = TransactionState.DONE.value
     local_session.commit()
-    return Response(status=200)
+    q1.put("done")
 
 
 @app.route("/updateTransactionState", methods=["PATCH"])
-def update_transaction_state():
+async def update_transaction_state():
+    q1 = Queue()
+    q2 = Queue()
+
     transaction_id = request.json["transaction_id"]
     state = request.json["state"]
     user_id = session.get("user_id")
@@ -334,8 +342,12 @@ def update_transaction_state():
         db.session.commit()
         update_crypto_currency(transaction.cryptocurrency, -
                                transaction.amount, crypto_account.crypto_currencies)
-        _thread.start_new_thread(
-            mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount))
+        #_thread.start_new_thread(
+        #   mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount, q1))
+        _thread.start_new_thread(announce, (q1, q2))
+        p = Process(target=mining, args=(user_id, transaction_id, transaction.cryptocurrency, transaction.amount, q1))
+        p.start()
+        q2.get()
     else:
         transaction.state = TransactionState.REJECTED.value
         db.session.commit()
@@ -566,7 +578,7 @@ def login_user():
 @app.route("/logout", methods=["POST"])
 def logout_user():
 
-    session.pop("user_id")
+    session.pop("user_id", None)
     return Response(status=200)
 
 
