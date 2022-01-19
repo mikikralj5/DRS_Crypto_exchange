@@ -31,7 +31,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
 
   const logOut = async () => {
-    const resp = await httpClient.post("http://127.0.0.1:5000/logout");
+    await httpClient.post("http://127.0.0.1:5000/logout");
     navigate("/");
   };
 
@@ -117,16 +117,20 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
     getCurrencyAll();
   }, []);
 
-  const showUserCrypto = () => {
+  const showUserCrypto = async () => {
     setToShow("userCrypto");
+    const resp = await httpClient.get("http://127.0.0.1:5000/getCrypto");
+    setUserCryptoList(resp.data);
   };
 
   const showCurrencyAll = () => {
     setToShow("all");
   };
 
-  const showTransactions = () => {
+  const showTransactions = async () => {
     setToShow("transactions");
+    const resp = await httpClient.get("http://127.0.0.1:5000/getTransactions");
+    setUserTransactions(resp.data);
   };
 
   const showTransactionRequests = () => {
@@ -178,6 +182,7 @@ const MainPage = ({ turnOnModal, turnOnErroModal }) => {
             turnOnModal={turnOnModal}
             onRequestResolve={onRequestResolve}
             addTransactions={addTransactions}
+            showTransactions={showTransactions}
           />
         ) : null}
       </div>

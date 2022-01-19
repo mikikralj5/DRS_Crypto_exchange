@@ -21,7 +21,8 @@ class User(db.Model):
     crypto_account = db.relationship(
         "CryptoAccount", backref="user", uselist=False
     )  # one to one
-    payment_card = db.relationship("PaymentCard", backref="user", uselist=False)
+    payment_card = db.relationship(
+        "PaymentCard", backref="user", uselist=False)
     transactions = db.relationship("Transaction", backref="user")
 
     def __init__(

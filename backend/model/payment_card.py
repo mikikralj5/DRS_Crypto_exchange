@@ -5,10 +5,10 @@ from marshmallow import Schema, fields
 class PaymentCard(db.Model):
     __tablename__ = "payment_card"
     id = db.Column(db.Integer, primary_key=True)
-    card_number = db.Column(db.String(50))
-    cvv = db.Column(db.String(50))
+    card_number = db.Column(db.String(500))
+    cvv = db.Column(db.String(500))
     expiration_date = db.Column(db.DateTime)
-    user_name = db.Column(db.String(50))
+    user_name = db.Column(db.String(500))
     money_amount = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 

@@ -271,6 +271,10 @@ def exchange():
         crypto_currencies = crypto_account.crypto_currencies
         crypto_currency = next(
             filter(lambda x: x.name == sell, crypto_currencies), None)
+
+        if crypto_currency == None:
+            return {"error": "You don't have this currency"}
+
         if sum_to_pay > crypto_currency.amount:
             return {"error": "You don't have enough crypto currency"}
         crypto_currency.amount -= sum_to_pay
@@ -281,6 +285,10 @@ def exchange():
         crypto_currencies = crypto_account.crypto_currencies
         crypto_currency = next(
             filter(lambda x: x.name == sell, crypto_currencies), None)
+
+        if crypto_currency == None:
+            return {"error": "You don't have this currency"}
+
         if sum_to_pay > crypto_currency.amount:
             return {"error": "you don't have enough crypto currency"}, 400
         crypto_currency.amount -= sum_to_pay
@@ -302,10 +310,12 @@ def announce(q1, q2):
 
 
 def mining(user_id, transaction_id, crypto_name, amount, q1):
-    sleep(5 * 6)
+    sleep(5 * 2)
     basedir = os.path.abspath(os.path.dirname(__file__))
-    engine = sqlalchemy.create_engine("sqlite:///" +
-                                      os.path.join(basedir, "CryptoDB.db"))
+    # engine = sqlalchemy.create_engine("sqlite:///" +
+    #                                   os.path.join(basedir, "CryptoDB.db"))
+    engine = sqlalchemy.create_engine(
+        'mysql+mysqlconnector://root:1234@db/mysql_db')
     local_session = sqlalchemy.orm.Session(bind=engine)
 
     transaction = local_session.query(Transaction).get(transaction_id)
@@ -375,6 +385,14 @@ def create_transaction():
     if user_exists(recipient_email) is True:
         user_id = session.get("user_id")
         user = User.query.get(user_id)
+
+        user_crypto = user.crypto_account.crypto_currencies
+        temp = filter(lambda x: x.name ==
+                      cryptocurrency and x.amount > amount, user_crypto)
+        temp = list(temp)
+        if temp == []:
+            return {"error": "You don't have enough resources for this transfer"}
+
         keccak = keccak_256()
         generated_string = "" + user.email + recipient_email + \
             str(amount) + str(randint(0, 1000))
