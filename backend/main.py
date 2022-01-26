@@ -1,6 +1,6 @@
 import bcrypt
 import sqlalchemy
-from flask import Flask, jsonify, request, abort, session, Response
+from flask import Flask, jsonify, request, abort, session, Response, render_template
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
@@ -201,6 +201,25 @@ def get_crypto_value():
     return crypto_value_list, 200
 
 
+@app.route('/getCryptoValues')
+def get_crypto_values():
+    url = "https://data.messari.io/api/v2/assets"
+    headers = {"x-messari-api-key": "efcebeba-bfe6-4062-b481-9e699487e824"}
+    params = {"limit": 500}
+    sess = requests.Session()
+    sess.headers.update(headers)
+    response = sess.get(url, params=params)
+    json_p = response.json()
+    crypto_currencies = json_p["data"]
+    dictionary = {}
+    for crypto in crypto_currencies:
+        name = crypto["name"]
+        price = crypto["metrics"]["market_data"]["price_usd"]
+        dictionary[name] = round(price, 2)
+
+    return render_template("prikazkriptovaluta.html", crypto=dictionary)
+
+
 @app.route("/showCryptoSymbols")
 def get_all_crypto_currencies():
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
@@ -218,6 +237,7 @@ def get_all_crypto_currencies():
         crypto_list.append(str(json_response["data"][i]["symbol"]))
     crypto_list = json.dumps(crypto_list)
     return crypto_list
+
 
 
 @app.route("/exchange", methods=["PATCH"])
@@ -277,8 +297,8 @@ def exchange():
 
         if sum_to_pay > crypto_currency.amount:
             return {"error": "You don't have enough crypto currency"}
-        crypto_currency.amount -= amount
-        crypto_account.amount += sum_to_pay
+        crypto_currency.amount -= sum_to_pay
+        crypto_account.amount += amount
         db.session.commit()
 
     else:
@@ -354,16 +374,14 @@ async def update_transaction_state():
     state = request.json["state"]
     user_id = session.get("user_id")
     transaction = Transaction.query.get(transaction_id)
-    recipient = User.query.filter_by(email=transaction.sender).first()
-    crypto_account = recipient.crypto_account
+    sender = User.query.filter_by(email=transaction.sender).first()
+    crypto_account = sender.crypto_account
 
     if TransactionState[state].value == "IN_PROGRESS":
         transaction.state = TransactionState.IN_PROGRESS.value
         db.session.commit()
-        update_crypto_currency(transaction.cryptocurrency, -transaction.amount,
+        update_crypto_currency(transaction.cryptocurrency, -(transaction.amount + transaction.gas),
                                crypto_account.crypto_currencies)
-        # _thread.start_new_thread(
-        #   mining, (user_id, transaction_id, transaction.cryptocurrency, transaction.amount, q1))
         _thread.start_new_thread(announce, (q1, q2))
         p = Process(target=mining,
                     args=(user_id, transaction_id, transaction.cryptocurrency,
@@ -382,27 +400,41 @@ def create_transaction():
     recipient_email = request.json["recepient"]
     amount = int(request.json["transferAmount"])
     cryptocurrency = request.json["currencyTransfer"]
+
     if user_exists(recipient_email) is True:
         user_id = session.get("user_id")
         user = User.query.get(user_id)
-
         user_crypto = user.crypto_account.crypto_currencies
-        temp = filter(lambda x: x.name ==
-                      cryptocurrency and x.amount > amount, user_crypto)
-        temp = list(temp)
-        if temp == []:
-            return {"error": "You don't have enough resources for this transfer"}
 
         keccak = keccak_256()
         generated_string = "" + user.email + recipient_email + \
-            str(amount) + str(randint(0, 1000))
+                           str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
+
+        temp = filter(lambda x: x.name ==
+                      cryptocurrency and x.amount > amount + 0.05 * amount, user_crypto)
+        temp = list(temp)
+        if temp == []:
+            transaction = Transaction(
+                hashID=keccak.hexdigest(),
+                sender=user.email,
+                recipient=recipient_email,
+                amount=amount,
+                gas=amount * 0.05,
+                cryptocurrency=cryptocurrency,
+                user_id=user_id,
+                user=user,
+                state=TransactionState.REJECTED.value)
+            db.session.add(transaction)
+            db.session.commit()
+            return {"error": "You don't have enough resources for this transfer"}
 
         transaction = Transaction(
             hashID=keccak.hexdigest(),
             sender=user.email,
             recipient=recipient_email,
             amount=amount,
+            gas=amount * 0.05,
             cryptocurrency=cryptocurrency,
             user_id=user_id,
             user=user,
