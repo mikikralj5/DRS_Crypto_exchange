@@ -277,8 +277,8 @@ def exchange():
 
         if sum_to_pay > crypto_currency.amount:
             return {"error": "You don't have enough crypto currency"}
-        crypto_currency.amount -= sum_to_pay
-        crypto_account.amount += amount
+        crypto_currency.amount -= amount
+        crypto_account.amount += sum_to_pay
         db.session.commit()
 
     else:
