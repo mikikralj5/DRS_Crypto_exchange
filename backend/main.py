@@ -94,19 +94,6 @@ def create_crypto_account(user):
     return "crypto_account created", 200
 
 
-# Da li ovo uopste treba???
-@app.route("/depositPayment_Card", methods=["PATCH"])
-def deposit_payment_card():
-    amount = request.json["amount"]
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-    payment_card = user.payment_card
-    payment_card.amount += amount
-    db.session.commit()
-
-    return Response(status=200)
-
-
 @app.route("/depositCrypto_Account", methods=["PATCH"])
 def deposit():
     amount = request.json["amount"]
@@ -124,29 +111,6 @@ def deposit():
     return Response(status=200)
 
 
-#
-# @app.route("/createCrypto_Currency", methods=["POST"])
-# def create_crypto_currency():
-#     amount = request.json["amount"]
-#     name = request.json["name"]
-#     account_id = request.json["account_id"]
-#     crypto_account = CryptoAccount.query.get(account_id)
-#     crypto_currency = CryptoCurrency(amount=amount, name=name, account_id=account_id, account=crypto_account)
-#     db.session.add(crypto_currency)
-#     db.session.commit()
-#     return "crypto_currency created", 200
-
-
-def send_mail(user):
-    letters = string.ascii_letters
-    user.otp = ''.join(random.choice(letters) for i in range(5))
-    msg = Message(subject="Verification Code",
-                  sender="mailzaaplikaciju21@gmail.com",
-                  recipients=[user.email])
-    msg.body = "Email Verification code = " + user.otp
-    mail.send(msg)
-
-
 def user_exists(email):
     user_exist = User.query.filter_by(email=email).first()
     if user_exist is None:
@@ -155,7 +119,6 @@ def user_exists(email):
         return True
 
 
-# izmeni metoduda bude clean
 def update_crypto_currency(name, amount, crypto_currencies):
     crypto_currency = next(filter(lambda x: x.name == name, crypto_currencies),
                            None)
@@ -294,7 +257,6 @@ def exchange():
         crypto_currency.amount -= sum_to_pay
         crypto_currencies = crypto_account.crypto_currencies
         iterator = filter(lambda x: x.name == buy, crypto_currencies)
-        # da bi vratio listu ovo ogre je iterator
         crypto_currencies = list(iterator)
         if crypto_currencies == []:
             create_crypto_currency(buy, amount, crypto_account)
@@ -324,7 +286,6 @@ def mining(user_id, transaction_id, crypto_name, amount, q1):
     crypto_account = user.crypto_account
     crypto_currencies = crypto_account.crypto_currencies
     iterator = filter(lambda x: x.name == crypto_name, crypto_currencies)
-    # da bi vratio listu ovo ogre je iterator
     crypto_currencies = list(iterator)
     if crypto_currencies == []:
         crypto_currency = CryptoCurrency(amount=amount,
@@ -388,7 +349,7 @@ def create_transaction():
 
         user_crypto = user.crypto_account.crypto_currencies
         temp = filter(lambda x: x.name ==
-                      cryptocurrency and x.amount > amount, user_crypto)
+                      cryptocurrency and x.amount >= amount, user_crypto)
         temp = list(temp)
         if temp == []:
             return {"error": "You don't have enough resources for this transfer"}
@@ -397,6 +358,25 @@ def create_transaction():
         generated_string = "" + user.email + recipient_email + \
             str(amount) + str(randint(0, 1000))
         keccak.update(generated_string.encode())
+
+        # provera za gas
+        temp = filter(lambda x: x.name ==
+                      cryptocurrency and x.amount >= amount + 0.05 * amount, user_crypto)
+        temp = list(temp)
+        if temp == []:
+            transaction = Transaction(
+                hashID=keccak.hexdigest(),
+                sender=user.email,
+                recipient=recipient_email,
+                amount=amount,
+                gas=amount * 0.05,
+                cryptocurrency=cryptocurrency,
+                user_id=user_id,
+                user=user,
+                state=TransactionState.REJECTED.value)
+            db.session.add(transaction)
+            db.session.commit()
+            return {"error": "You can't make the transaction because of gas commision fee"}
 
         transaction = Transaction(
             hashID=keccak.hexdigest(),
@@ -491,7 +471,6 @@ def get_transactions():
         lambda x: x.state != TransactionState.WAITING_FOR_USER.value and
         (x.sender == user.email or x.recipient == user.email),
         all_transactions)
-    # da bi vratio listu ovo ogre je iterator
     all_transactions = list(iterator)
     schema = TransactionSchema(many=True)  # ako vracam vise
     results = schema.dump(all_transactions)
@@ -597,8 +576,6 @@ def register_user():
     hashed_password = bcrypt.generate_password_hash(password).decode('utf8')
     user = User(name, lname, address, hashed_password, email, phone, country,
                 city)
-
-    # send_mail(user)
 
     db.session.add(user)
     db.session.commit()
